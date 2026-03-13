@@ -1,0 +1,115 @@
+<mvc:View
+    controllerName="gvtracker.controller.ViewBillInfo"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+>
+    <Page title="Gift Voucher Tracker - Customer Purchase Bill Details">
+        <headerContent>
+            <Button
+                text="Home"
+                icon="sap-icon://home"
+                press="onHome"
+            />
+        </headerContent>
+
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <HBox
+                    alignItems="Center"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <Label
+                        text="GVR Number:"
+                        width="200px"
+                    />
+                    <Input
+                        id="inputGVRNo"
+                        editable="false"
+                        width="300px"
+                    />
+                </HBox>
+
+                <HBox
+                    alignItems="Center"
+                    class="sapUiSmallMarginBottom"
+                >
+                    <Label
+                        text="Total Customer Bill Value:"
+                        width="200px"
+                    />
+                    <Input
+                        id="inputTotalBill"
+                        editable="false"
+                        width="300px"
+                    />
+                </HBox>
+
+                <Title
+                    text="Customer Purchase Bill Details"
+                    level="H4"
+                    class="sapUiMediumMarginTop sapUiSmallMarginBottom"
+                />
+
+                <Table
+                    id="billsTable"
+                    inset="false"
+                    items="{bill>/bills/results}"
+                >
+                    <columns>
+                        <Column width="10%">
+                            <Text text="Sr.No" />
+                        </Column>
+                        <Column width="45%">
+                            <Text text="Bill No" />
+                        </Column>
+                        <Column width="45%">
+                            <Text text="Bill Value" />
+                        </Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{bill>sr_no}" />
+                                <Text text="{bill>b_no}" />
+                                <Text text="{bill>b_amount}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+                <Title
+                    text="Bill Attachments"
+                    level="H4"
+                    class="sapUiMediumMarginTop sapUiSmallMarginBottom"
+                />
+
+                <List
+                    id="attachmentList"
+                    items="{bill>/bills/results}"
+                >
+                    <CustomListItem>
+                        <VBox class="sapUiSmallMargin">
+                            <Text text="Sr.No: {bill>sr_no}" />
+
+                            <Link
+                                text="{bill>attachment/fileName}"
+                                press="onDownloadAttachment"
+                                class="sapUiSmallMarginEnd"
+                            />
+                        </VBox>
+                    </CustomListItem>
+                </List>
+            </VBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Back"
+                    press="onBack"
+                />
+            </Toolbar>
+        </footer>
+    </Page>
+</mvc:View>

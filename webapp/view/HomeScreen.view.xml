@@ -1,0 +1,58 @@
+<mvc:View
+    controllerName="gvtracker.controller.HomeScreen"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+>
+    <Page
+        id="page"
+        title="Gift Voucher Tracker - Customer GIft issue Selection screen"
+    >
+        <headerContent>
+            <Button text="User Profile" />
+        </headerContent>
+
+        <content>
+            <VBox
+                class="sapUiMarginSmall"
+                alignItems="Center"
+            >
+                <HBox
+                    alignItems="Center"
+                    class="sapUiSmallMarginBottom"
+                    justifyContent="Center"
+                >
+                    <Label
+                        text="GVR Number"
+                        width="120px"
+                    />
+                    <Input
+                        width="200px"
+                        placeholder="Enter GVR Number"
+                        id="GVRInput"
+                        enabled="false"
+                        showValueHelp="true"
+                        valueHelpRequest="onGVRValueHelp"
+                    />
+                    <Button
+                        text="Execute"
+                        press="OnExecute"
+                        class="sapUiSmallMarginBegin"
+                    />
+                </HBox>
+
+                <RadioButtonGroup
+                    id="modeSelect"
+                    selectedIndex="0"
+                    select="onModeSelect"
+                >
+                    <buttons>
+                        <RadioButton text="CREATE" />
+                        <RadioButton text="RETURN" />
+                        <RadioButton text="REPLACEMENT" />
+                        <RadioButton text="DISPLAY" />
+                    </buttons>
+                </RadioButtonGroup>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

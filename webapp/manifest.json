@@ -1,0 +1,171 @@
+{
+  "_version": "1.82.0",
+  "sap.app": {
+    "id": "gvtracker",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "0.0.1"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v2/gv-tracker/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "mainServiceV4": {
+        "uri": "/odata/v4/gv-tracker/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.145.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.ui.comp": {},
+        "sap.ui.table": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "": {
+        "dataSource": "mainService",
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "useBatch": false
+        },
+        "type": "sap.ui.model.odata.v2.ODataModel"
+      },
+      "v4Model": {
+        "dataSource": "mainServiceV4",
+        "type": "sap.ui.model.odata.v4.ODataModel",
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true
+        }
+      },
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "gvtracker.i18n.i18n"
+        }
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "controlAggregation": "pages",
+        "controlId": "app",
+        "transition": "slide",
+        "type": "View",
+        "viewType": "XML",
+        "path": "gvtracker.view",
+        "async": true
+      },
+      "routes": [
+        {
+          "name": "RouteHomeScreen",
+          "pattern": ":?query:",
+          "target": ["TargetHomeScreen"]
+        },
+        {
+          "name": "RouteCreateScreen",
+          "pattern": "create",
+          "target": ["TargetCreateScreen"]
+        },
+        {
+          "name": "RouteAddCustomer",
+          "pattern": "AddCustomer",
+          "target": ["TargetAddCustomer"]
+        },
+        {
+          "name": "RouteAddBillInfo",
+          "pattern": "AddBillInfo/{mobile}",
+          "target": ["TargetAddCustomerBillInfo"]
+        },
+        {
+          "name": "RouteReturnScreen",
+          "pattern": "Return",
+          "target": ["TargetReturnScreen"]
+        },
+        {
+          "name": "RouteReplacementScreen",
+          "pattern": "Replacement",
+          "target": ["TargetReplacementScreen"]
+        },
+        {
+          "name": "RouteDisplayScreen",
+          "pattern": "Display/{gvr}",
+          "target": ["TargetDisplayScreen"]
+        },{
+            "name" :"RouteViewBillInfoScreen",
+            "pattern":"BillInfo/{custID}",
+            "target":["TargetViewBillInfoScreen"]
+        }
+      ],
+      "targets": {
+        "TargetHomeScreen": {
+          "id": "HomeScreen",
+          "name": "HomeScreen"
+        },
+        "TargetCreateScreen": {
+          "id": "CreateScreen",
+          "name": "CreateScreen"
+        },
+        "TargetAddCustomer": {
+          "id": "AddCustomerProfile",
+          "name": "AddCustomerProfile"
+        },
+        "TargetAddCustomerBillInfo": {
+          "id": "AddCustomerBillInfo",
+          "name": "AddCustomerBillInfo"
+        },
+        "TargetReturnScreen": {
+          "id": "ReturnScreen",
+          "name": "ReturnScreen"
+        },
+        "TargetReplacementScreen": {
+          "id": "ReplacementScreen",
+          "name": "ReplacementScreen"
+        },
+        "TargetDisplayScreen": {
+          "id": "DisplayScreen",
+          "name": "DisplayScreen"
+        },
+        "TargetViewBillInfoScreen":{ 
+
+        "id":"ViewBillInfoScreen",
+        "name":"ViewBillInfoScreen"
+        }
+      }
+    },
+    "rootView": {
+      "viewName": "gvtracker.view.App",
+      "type": "XML",
+      "id": "App",
+      "async": true
+    }
+  }
+}

@@ -1,0 +1,123 @@
+<mvc:View
+    controllerName="gvtracker.controller.AddCustomerBillInfo"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:unified="sap.ui.unified"
+>
+    <Page title="Gift Voucher Tracker - Customer Purchase Bill Details">
+        <content>
+            <VBox class="sapUiMediumMargin">
+                <f:SimpleForm
+                    layout="ResponsiveGridLayout"
+                    columnsXL="2"
+                    columnsL="2"
+                    columnsM="2"
+                >
+                    <Label text="Customer Mobile" />
+                    <Input
+                        id="mobileInputCustomerBillInfo"
+                        editable="false"
+                    />
+
+                    <Label text="Total Customer Bill Value" />
+                    <Input
+                        id="totalBillValue"
+                        value="0"
+                        editable="false"
+                    />
+                </f:SimpleForm>
+
+                <Toolbar class="sapUiMediumMarginTop">
+                    <Title text="Customer Purchase Bill Details" />
+                    <ToolbarSpacer />
+                    <Button
+                        icon="sap-icon://add"
+                        tooltip="Add Row"
+                        press="onAddBillRow"
+                    />
+                    <Button
+                        icon="sap-icon://delete"
+                        tooltip="Delete Selected Rows"
+                        press="onDeleteBillRow"
+                    />
+
+                     <Button text="Submit" tooltip="Submit" press="onNext" />
+                </Toolbar>
+
+                <Table
+                    id="billTable"
+                    mode="MultiSelect"
+                    growing="true"
+                    inset="false"
+                    noDataText="No bill entries. Click + to add a row."
+                    items="{billModel>/bills}"
+                >
+                    <columns>
+                        <Column width="60px">
+                            <Text text="Sr.No" />
+                        </Column>
+                        <Column width="160px">
+                            <Text text="Bill No" />
+                        </Column>
+                        <Column width="140px">
+                            <Text text="Bill Value" />
+                        </Column>
+                        <Column width="160px">
+                            <Text text="Upload File" />
+                        </Column>
+                        <Column width="150px">
+                            <Text text="Upload Photo" />
+                        </Column>
+                        <Column width="120px">
+                            <Text text="Captured Photo" />
+                        </Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{billModel>srNo}" />
+
+                                <Input
+                                    value="{billModel>billNo}"
+                                    placeholder="Bill No"
+                                    width="140px"
+                                />
+
+                                <Input
+                                    value="{billModel>billValue}"
+                                    placeholder="0.00"
+                                    type="Number"
+                                    width="120px"
+                                    liveChange="onBillValueChange"
+                                />
+
+                                <unified:FileUploader
+                                    buttonText="Upload"
+                                    icon="sap-icon://upload"
+                                    width="140px"
+                                    change="onFileChange"
+                                />
+
+                                <Button
+                                    icon="sap-icon://camera"
+                                    text="Camera"
+                                    press="onOpenCamera"
+                                />
+
+                                <Image
+                                    src="{billModel>photo}"
+                                    visible="{billModel>photoVisible}"
+                                    width="90px"
+                                    height="70px"
+                                />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

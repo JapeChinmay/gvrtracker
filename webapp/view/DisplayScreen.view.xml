@@ -1,0 +1,203 @@
+<mvc:View
+    controllerName="gvtracker.controller.DisplayScreen"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form">
+
+    <Page title="Gift Voucher Tracker - Gift Issue to Customer Activity - DISPLAY Screen">
+
+        <headerContent>
+            <Button text="Home" icon="sap-icon://home" press="onHome"/>
+        </headerContent>
+
+        <subHeader>
+            <Toolbar>
+                <RadioButtonGroup
+                    id="displayModeSelect"
+                    selectedIndex="0"
+                    columns="3"
+                    select="onDisplayModeSelect">
+                    <buttons>
+                        <RadioButton id="CreateRadio" text="Create"/>
+                        <RadioButton id="ReturnRadio" text="Return"/>
+                        <RadioButton id="ReplacementRadio" text="Replacement"/>
+                    </buttons>
+                </RadioButtonGroup>
+            </Toolbar>
+        </subHeader>
+
+        <content>
+            <HBox height="100%">
+
+                <VBox width="25%" class="sapUiSmallMargin">
+
+                    <Title text="GVR Numbers" level="H4" class="sapUiSmallMarginBottom"/>
+
+                    <SearchField
+                        id="gvrListSearch"
+                        placeholder="Search by GVR Number"
+                        search="onGVRListSearch"
+                        liveChange="onGVRListSearch"
+                        width="100%"/>
+
+                    <List
+                        id="gvrList"
+                        mode="SingleSelectMaster"
+                        selectionChange="onGVRItemSelect"
+                        items="{
+                            path: '/GVHeaderSet',
+                            parameters: {
+                                expand: 'customer,assignGiftVouchers/giftVoucher,campaign,returnGiftVouchers/giftVoucher'
+                            }
+                        }">
+                        <StandardListItem
+                            title="{gv_no}"
+                            type="Active"/>
+                    </List>
+
+                </VBox>
+
+                <VBox width="75%" class="sapUiSmallMargin">
+
+                    <Title text="GVR Details" level="H4" class="sapUiSmallMarginBottom"/>
+
+                    <f:SimpleForm
+                        layout="ResponsiveGridLayout"
+                        columnsXL="2"
+                        columnsL="2"
+                        columnsM="2">
+
+                        <Label text="GVR Number:"/>
+                        <Text id="detailGVRNo" text="{gv_no}"/>
+
+                        <Label text="Total Gift Items Value:"/>
+                        <Text id="detailTotalValue" text="{assignGiftsTotal_amt}"/>
+
+                    </f:SimpleForm>
+
+                    <Button
+                        id="viewBillInfoBtn"
+                        text="View Customer Bill Info"
+                        width="100%"
+                        class="sapUiSmallMarginBottom"
+                        press="onViewBillInfo"/>
+
+                    <f:SimpleForm
+                        layout="ResponsiveGridLayout"
+                        columnsXL="2"
+                        columnsL="2"
+                        columnsM="1">
+
+                        <Label text="Customer Type:"/>
+                        <Text id="detailCustType" text="{cust_type_code}"/>
+
+                        <Label text="Customer Mobile:"/>
+                        <Text id="detailCustMobile" text="{customer/phone}"/>
+
+                        <Label text="Campaign:"/>
+                        <Text id="detailCampaign" text="{campaign/name}"/>
+
+                        <Label text="GVR Date:"/>
+                        <Text id="detailGVRDate" text="{createdAt}"/>
+
+                        <Label text="Employee ID/Name:"/>
+                        <Text id="detailEmployee" text="{employee_code}"/>
+
+                        <Label text="Shopping Mall:"/>
+                        <Text id="detailMall" text="{shoppingMall_plant_code}"/>
+
+                    </f:SimpleForm>
+
+                    <HBox class="sapUiSmallMarginTop">
+                        <Label text="Comments :"/>
+                        <Text id="detailComments" text="{comment}" class="sapUiSmallMarginBegin"/>
+                    </HBox>
+
+               
+                    <Title
+                        text="Gift Items list issued to Customer"
+                        level="H4"
+                        class="sapUiMediumMarginTop"/>
+
+                    <Table  visible="true"
+                        id="giftItemsTable"
+                        inset="false"
+                        items="{path: 'assignGiftVouchers'}">
+
+                        <columns>
+                            <Column><Text text="Material Name"/></Column>
+                            <Column><Text text="Description"/></Column>
+                            <Column><Text text="Price"/></Column>
+                            <Column><Text text="Issue Qty"/></Column>
+                            <Column><Text text="Coupon"/></Column>
+                            <Column><Text text="Brand"/></Column>
+                            <Column><Text text="Expiry Date"/></Column>
+                        </columns>
+
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{giftVoucher/material}"/>
+                                    <Text text="{giftVoucher/descr}"/>
+                                    <Text text="{giftVoucher/price}"/>
+                                    <Text text="{issue_quantity}"/>
+                                    <Text text="{giftVoucher/coupon}"/>
+                                    <Text text="{giftVoucher/brand}"/>
+                                    <Text text="{giftVoucher/expDate}"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+
+                    </Table>
+
+                    <Title
+                        text="Gift Items Returned by Customer"
+                        level="H4"
+                        class="sapUiMediumMarginTop"/>
+
+                    <Table  visible="false"
+                        id="returnGiftItemsTable"
+                        inset="false"
+                        noDataText="No return gifts for this GVR"
+                        items="{path: 'returnGiftVouchers'}">
+
+                        <columns>
+                            <Column><Text text="Material Name"/></Column>
+                            <Column><Text text="Description"/></Column>
+                            <Column><Text text="Price"/></Column>
+                            <Column><Text text="Return Qty"/></Column>
+                            <Column><Text text="Coupon"/></Column>
+                            <Column><Text text="Brand"/></Column>
+                            <Column><Text text="Expiry Date"/></Column>
+                        </columns>
+
+                        <items>
+                            <ColumnListItem>
+                                <cells>
+                                    <Text text="{giftVoucher/material}"/>
+                                    <Text text="{giftVoucher/descr}"/>
+                                    <Text text="{giftVoucher/price}"/>
+                                    <Text text="{return_quantity}"/>
+                                    <Text text="{giftVoucher/coupon}"/>
+                                    <Text text="{giftVoucher/brand}"/>
+                                    <Text text="{giftVoucher/expDate}"/>
+                                </cells>
+                            </ColumnListItem>
+                        </items>
+
+                    </Table>
+
+                </VBox>
+
+            </HBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button text="Back" press="onHome"/>
+            </Toolbar>
+        </footer>
+
+    </Page>
+</mvc:View>

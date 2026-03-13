@@ -1,0 +1,41 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <Dialog
+        id="cameraDialog"
+        title="Capture Photo"
+        contentWidth="420px">
+
+        <content>
+            <VBox alignItems="Center" class="sapUiSmallMargin">
+
+                <core:HTML
+                    content='&lt;video id="cameraVideo" width="380" height="260" autoplay playsinline style="border-radius:8px"&gt;&lt;/video&gt;'
+                />
+
+                <HBox class="sapUiSmallMarginTop" justifyContent="Center">
+                    <Button
+                        text="Capture"
+                        type="Emphasized"
+                        press="onCapturePhoto"
+                        class="sapUiSmallMarginEnd"
+                    />
+                    <Button
+                        text="Cancel"
+                        press="onCloseCamera"
+                    />
+                </HBox>
+
+                <Image
+                    id="capturedImage"
+                    width="200px"
+                    class="sapUiSmallMarginTop"
+                />
+
+            </VBox>
+        </content>
+
+    </Dialog>
+
+</core:FragmentDefinition>

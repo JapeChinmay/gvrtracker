@@ -1,0 +1,109 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout">
+
+    <Dialog
+        id="gvrValueHelpDialog"
+        title="Select: GVR Number"
+        contentWidth="900px"
+        resizable="true"
+        draggable="true">
+
+        <content>
+            <VBox class="sapUiSmallMargin">
+
+        
+                <HBox alignItems="Center" class="sapUiSmallMarginBottom">
+                    <SearchField
+                        id="gvrSearchField"
+                        width="100%"
+                        placeholder="Search"
+                        search="onGVRSearch"
+                        liveChange="onGVRSearch"/>
+                    <Button
+                        text="Go"
+                        type="Emphasized"
+                        class="sapUiSmallMarginBegin"
+                        press="onGVRSearch"/>
+                    <Button
+                        text="Hide Filters"
+                        id="toggleFilterBtn"
+                        class="sapUiSmallMarginBegin"
+                        press="onToggleFilters"/>
+                </HBox>
+
+                <VBox id="filterBox">
+                    <HBox class="sapUiSmallMarginBottom">
+                        <VBox width="50%">
+                            <Label text="GVR Number:"/>
+                            <Input
+                                id="filterGVRNo"
+                                width="95%"
+                                showValueHelp="false"/>
+                        </VBox>
+                        <VBox width="50%">
+                            <Label text="Customer phone:"/>
+                            <Input
+                                id="filterPhone"
+                                width="95%"/>
+                        </VBox>
+                    </HBox>
+                    <HBox class="sapUiSmallMarginBottom">
+                        <VBox width="50%">
+                            <Label text="GVR type:"/>
+                            <Input
+                                id="filterGVRType"
+                                width="95%"/>
+                        </VBox>
+                    </HBox>
+                </VBox>
+
+             
+                <Table
+                    id="gvrResultTable"
+                    inset="false"
+                    items="{/GVHeaderSet}"
+                    mode="SingleSelectMaster"
+                    selectionChange="onGVRSelect">
+
+                    <headerToolbar>
+                        <Toolbar>
+                            <Title id="gvrTableTitle" text="Items"/>
+                        </Toolbar>
+                    </headerToolbar>
+
+                    <columns>
+                        <Column width="33%">
+                            <Text text="GVR Number"/>
+                        </Column>
+                        <Column width="33%">
+                            <Text text="GVR type"/>
+                        </Column>
+                        <Column width="33%">
+                            <Text text="Customer phone"/>
+                        </Column>
+                    </columns>
+
+                    <items>
+                        <ColumnListItem type="Active">
+                            <cells>
+                                <Text text="{gv_no}"/>
+                                <Text text="{gvr_type_code}"/>
+                                <Text text="{customer/phone}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+
+                </Table>
+
+            </VBox>
+        </content>
+
+        <endButton>
+            <Button text="Cancel" press="onGVRCancel"/>
+        </endButton>
+
+    </Dialog>
+
+</core:FragmentDefinition>

@@ -1,0 +1,114 @@
+<mvc:View
+    controllerName="gvtracker.controller.AddCustomerProfile"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+
+    <Page title="Gift Voucher Tracker - Mall Customer Profile">
+
+        <content>
+
+            <VBox width="70%" class="sapUiMediumMargin">
+
+                <f:SimpleForm
+                    layout="ResponsiveGridLayout"
+                    labelSpanXL="3"
+                    labelSpanL="3"
+                    labelSpanM="3"
+                    columnsXL="1"
+                    columnsL="1"
+                    columnsM="1"
+                    editable="true">
+
+               
+
+                    <Label text="Cust. Mobile Number" required="true"/>
+
+                    <Input
+                        value="{customer>/phone}"
+                        width="50%"
+                        maxLength="10"
+                        type="Number"/>
+
+
+              
+
+                    <Label text="Mobile Country Code"/>
+
+                    <Select
+                        width="50%"
+                        items="{/CountryCodes}"
+                        selectedKey="{customer>/phoneCode_code}">
+
+                        <core:Item
+                            key="{code}"
+                            text="{code}"/>
+
+                    </Select>
+
+
+                
+
+                    <Label text="Customer Title" required="true"/>
+
+                    <Select
+                        width="50%"
+                        items="{/Salutations}"
+                        selectedKey="{customer>/salutation_code}">
+
+                        <core:Item
+                            key="{code}"
+                            text="{name}"/>
+
+                    </Select>
+
+
+              
+
+                    <Label text="Customer Name" required="true"/>
+
+                    <Input
+                        value="{customer>/name}"
+                        width="50%"/>
+
+
+               
+
+                    <Label text="Customer Email"/>
+
+                    <Input
+                        value="{customer>/email}"
+                        width="50%"/>
+
+                </f:SimpleForm>
+
+
+             
+
+                <Toolbar
+                    width="50%"
+                    class="sapUiMediumMarginTop">
+
+                    <ToolbarSpacer/>
+
+                    <Button
+                        text="Cancel"
+                        width="150px"
+                        press="onCancel"/>
+
+                    <Button
+                        text="Add Customer"
+                        width="150px"
+                      
+                        press="onAddCustomer"/>
+
+                </Toolbar>
+
+            </VBox>
+
+        </content>
+
+    </Page>
+
+</mvc:View>

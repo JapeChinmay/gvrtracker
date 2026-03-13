@@ -1,0 +1,193 @@
+<mvc:View
+    controllerName="gvtracker.controller.ReturnScreen"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:f="sap.ui.layout.form"
+    xmlns:t="sap.ui.table"
+    xmlns:core="sap.ui.core">
+
+    <Page title="Gift Voucher Tracker-Gift Return Activity - CREATE Screen">
+
+        <headerContent>
+            <Button text="Home" icon="sap-icon://home" press="onHome"/>
+        </headerContent>
+
+        <content>
+            <VBox class="sapUiSmallMargin">
+
+         
+                <f:SimpleForm
+                    layout="ResponsiveGridLayout"
+                    columnsXL="4"
+                    columnsL="4"
+                    columnsM="2"
+                    editable="false">
+
+                    <f:content>
+                        <Label text="Shopping Mall :"/>
+                        <Text id="txtMall" text=""/>
+
+                        <Label text="Customer Mobile :" design="Bold"/>
+                        <HBox alignItems="Center">
+                            <Input
+                                id="mobileInput"
+                                placeholder="Enter Mobile"
+                                value=""
+                                required="true"
+                                showValueHelp="true"
+                                valueHelpRequest="onMobileValueHelp"
+                                liveChange="onMobileChange"
+                                width="250px"/>
+                        </HBox>
+
+                        <Label text="Employee ID / Name :"/>
+                        <Input id="inputEmployee" value="" editable="false" width="250px"/>
+
+                        <Label text="GVR Date :"/>
+                        <Text id="txtGVRDate" text=""/>
+                    </f:content>
+                </f:SimpleForm>
+
+                <f:SimpleForm
+                    layout="ResponsiveGridLayout"
+                    columnsXL="2"
+                    columnsL="2"
+                    columnsM="1"
+                    editable="false">
+                    <f:content>
+                        <Label text="Total Return Items Value :"/>
+                        <Text id="txtTotalReturnValue" text="0"/>
+                    </f:content>
+                </f:SimpleForm>
+
+                <VBox class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                    <Label text="Comments :"/>
+                    <Input id="inputComments" width="100%" placeholder="Enter comments"/>
+                </VBox>
+
+              
+                <Toolbar design="Transparent" class="sapUiSmallMarginTop">
+                    <Title text="Gifts Assigned to Customer" level="H4"/>
+                    <ToolbarSpacer/>
+                    <Button
+                        text="Collapse all"
+                        type="Transparent"
+                        press="onCollapseAll"/>
+                    <Button
+                        text="Collapse selection"
+                        type="Transparent"
+                        press="onCollapseSelection"/>
+                    <Button
+                        text="Expand first level"
+                        type="Transparent"
+                        press="onExpandFirstLevel"/>
+                    <Button
+                        text="Expand selection"
+                        type="Transparent"
+                        press="onExpandSelection"/>
+                </Toolbar>
+
+      
+                <t:TreeTable
+                    id="assignedGiftsTree"
+                    selectionMode="MultiToggle"
+                    visibleRowCountMode="Auto"
+                    minAutoRowCount="5"
+                    rowSelectionChange="onRowSelectionChange"
+                    enableSelectAll="false">
+
+                    <t:columns>
+                        <t:Column width="130px">
+                            <Label text="GVR Number"/>
+                            <t:template>
+                                <Text text="{treeModel>gvr_no}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="150px">
+                            <Label text="Campaign"/>
+                            <t:template>
+                                <Text text="{treeModel>campaign}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="130px">
+                            <Label text="Issue Date"/>
+                            <t:template>
+                                <Text text="{treeModel>issueDate}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="140px">
+                            <Label text="Coupon"/>
+                            <t:template>
+                                <Text text="{treeModel>coupon}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="140px">
+                            <Label text="Material Na..."/>
+                            <t:template>
+                                <Text text="{treeModel>material}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="150px">
+                            <Label text="Description"/>
+                            <t:template>
+                                <Text text="{treeModel>descr}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="110px">
+                            <Label text="Brand"/>
+                            <t:template>
+                                <Text text="{treeModel>brand}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="110px">
+                            <Label text="Price"/>
+                            <t:template>
+                                <Text text="{treeModel>price}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="100px">
+                            <Label text="Issue Qty"/>
+                            <t:template>
+                                <Text text="{treeModel>issue_quantity}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="120px">
+                            <Label text="Return Qty"/>
+                            <t:template>
+                                <Input
+                                    value="{treeModel>return_quantity}"
+                                    type="Number"
+                                    width="90px"
+                                    visible="{treeModel>isLeaf}"
+                                    change="onReturnQtyChange"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="130px">
+                            <Label text="Expiry Date"/>
+                            <t:template>
+                                <Text text="{treeModel>expiryDate}"/>
+                            </t:template>
+                        </t:Column>
+                        <t:Column width="130px">
+                            <Label text="Total Gift Ite..."/>
+                            <t:template>
+                                <Text text="{treeModel>totalAmount}"/>
+                            </t:template>
+                        </t:Column>
+                    </t:columns>
+
+                </t:TreeTable>
+
+        </VBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button text="Cancel" press="onCancel"/>
+                <Button text="Submit" type="Emphasized" press="onSubmit"/>
+            </Toolbar>
+        </footer>
+
+    </Page>
+</mvc:View>
