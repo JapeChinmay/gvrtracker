@@ -9,70 +9,88 @@ sap.ui.define([
 
     return Controller.extend("gvtracker.controller.HomeScreen", {
 
+        /* ============================================================ */
+        /*  LIFECYCLE                                                     */
+        /* ============================================================ */
+
         onInit: function () {
-            var oModel = this.getOwnerComponent().getModel();
-            oModel.read("/CustomerSet", {
-                success: function (data) { console.log("Customers:", data); },
-                error: function (err) { console.log(err); }
-            });
-
-
+            // GVR input disabled by default (CREATE mode selected)
             this.byId("GVRInput").setEnabled(false);
         },
 
+        /* ============================================================ */
+        /*  MODE RADIO BUTTON                                            */
+        /* ============================================================ */
+
         onModeSelect: function (oEvent) {
-            var iSelectedIndex = oEvent.getSource().getSelectedIndex();
+            var iIndex    = oEvent.getSource().getSelectedIndex();
             var oGVRInput = this.byId("GVRInput");
 
-             if (iSelectedIndex === 0) {
+            if (iIndex === 0) {
+                // CREATE — GVR not needed
                 oGVRInput.setEnabled(false);
                 oGVRInput.setValue("");
                 oGVRInput.setPlaceholder("Not required for CREATE");
-             } else {
+            } else if (iIndex === 1) {
+                // RETURN — GVR not needed (customer selected on screen)
+                oGVRInput.setEnabled(false);
+                oGVRInput.setValue("");
+                oGVRInput.setPlaceholder("Not required for RETURN");
+            } else if (iIndex === 2) {
+                // REPLACEMENT — GVR not needed
+                oGVRInput.setEnabled(false);
+                oGVRInput.setValue("");
+                oGVRInput.setPlaceholder("Not required for REPLACEMENT");
+            } else if (iIndex === 3) {
+                // DISPLAY — GVR required
                 oGVRInput.setEnabled(true);
+                oGVRInput.setValue("");
                 oGVRInput.setPlaceholder("Enter GVR Number");
             }
         },
 
-        routeToCreateScreen: function () {
-            this.getOwnerComponent().getRouter().navTo("RouteCreateScreen");
-        },
-
+        /* ============================================================ */
+        /*  EXECUTE BUTTON                                               */
+        /* ============================================================ */
 
         OnExecute: function () {
             var iMode = this.byId("modeSelect").getSelectedIndex();
-            var sGVR = this.byId("GVRInput").getValue();
+            var sGVR  = this.byId("GVRInput").getValue().trim();
+            var oRouter = this.getOwnerComponent().getRouter();
 
             if (iMode === 0) {
-                this.routeToCreateScreen();
-            }    
-            
-            else if (iMode === 2) {
-                    this.getOwnerComponent().getRouter().navTo("RouteReplacementScreen");
+                // CREATE
+                oRouter.navTo("RouteCreateScreen");
 
-            }   if (iMode === 1) {
-                    this.getOwnerComponent().getRouter().navTo("RouteReturnScreen");
-                
-                }
-            
-            else {
+            } else if (iMode === 1) {
+                // RETURN
+                oRouter.navTo("RouteReturnScreen");
+
+            } else if (iMode === 2) {
+                // REPLACEMENT
+                oRouter.navTo("RouteReplacementScreen");
+
+            } else if (iMode === 3) {
+                // DISPLAY — GVR number required
                 if (!sGVR) {
-                    MessageToast.show("Please enter a GVR Number.");
+                    MessageToast.show("Please enter a GVR Number for Display.");
                     return;
                 }
-              else if (iMode === 3) {
-                    this.getOwnerComponent().getRouter().navTo("RouteDisplayScreen", { gvr: sGVR });
-                }
+                oRouter.navTo("RouteDisplayScreen", { gvr: sGVR });
             }
         },
+
+        /* ============================================================ */
+        /*  GVR VALUE HELP                                               */
+        /* ============================================================ */
 
         onGVRValueHelp: function () {
             var oView = this.getView();
 
             if (!this._gvrValueHelpDialog) {
                 Fragment.load({
-                    id: oView.getId(),
-                    name: "gvtracker.fragments.GVRNumber",
+                    id:         oView.getId(),
+                    name:       "gvtracker.fragments.GVRNumber",
                     controller: this
                 }).then(function (oDialog) {
                     this._gvrValueHelpDialog = oDialog;
@@ -88,18 +106,14 @@ sap.ui.define([
 
         _loadGVRData: function () {
             var oModel = this.getView().getModel();
+            var sViewId = this.getView().getId();
 
             oModel.read("/GVHeaderSet", {
-                urlParameters: {
-                    "$expand": "customer"
-                },
+                urlParameters: { "$expand": "customer" },
                 success: function (oData) {
-                    console.log("GVHeaderSet loaded:", oData.results);
-
-             
-                    var oTitle = this.byId(
-                        this.getView().getId() + "--gvrTableTitle"
-                    );
+                    console.log("GVHeaderSet loaded:", oData.results.length);
+                    // Update title in fragment with count
+                    var oTitle = Fragment.byId(sViewId, "gvrTableTitle");
                     if (oTitle) {
                         oTitle.setText("Items (" + oData.results.length + ")");
                     }
@@ -110,18 +124,22 @@ sap.ui.define([
             });
         },
 
+        /* ============================================================ */
+        /*  GVR FRAGMENT SEARCH                                          */
+        /* ============================================================ */
 
         onGVRSearch: function () {
-            var oView = this.getView();
-            var sGVRNo = oView.byId(oView.getId() + "--filterGVRNo").getValue();
-            var sPhone = oView.byId(oView.getId() + "--filterPhone").getValue();
-            var sGVRType = oView.byId(oView.getId() + "--filterGVRType").getValue();
-            var sSearch = oView.byId(oView.getId() + "--gvrSearchField").getValue();
+            var sViewId  = this.getView().getId();
+            // BUG FIX: field is "gv_no" not "gvr_no"
+            var sGVRNo   = Fragment.byId(sViewId, "filterGVRNo").getValue();
+            var sPhone   = Fragment.byId(sViewId, "filterPhone").getValue();
+            var sGVRType = Fragment.byId(sViewId, "filterGVRType").getValue();
+            var sSearch  = Fragment.byId(sViewId, "gvrSearchField").getValue();
 
             var aFilters = [];
 
             if (sGVRNo) {
-                aFilters.push(new Filter("gvr_no", FilterOperator.Contains, sGVRNo));
+                aFilters.push(new Filter("gv_no", FilterOperator.Contains, sGVRNo));
             }
             if (sPhone) {
                 aFilters.push(new Filter("customer/phone", FilterOperator.Contains, sPhone));
@@ -132,43 +150,52 @@ sap.ui.define([
             if (sSearch) {
                 aFilters.push(new Filter({
                     filters: [
-                        new Filter("gvr_no", FilterOperator.Contains, sSearch),
-                        new Filter("gvr_type_code", FilterOperator.Contains, sSearch)
+                        new Filter("gv_no",          FilterOperator.Contains, sSearch),
+                        new Filter("gvr_type_code",  FilterOperator.Contains, sSearch)
                     ],
-                    and: false  
+                    and: false
                 }));
             }
 
-            var oTable = this.byId(this.getView().getId() + "--gvrResultTable");
+            var oTable   = Fragment.byId(sViewId, "gvrResultTable");
             var oBinding = oTable.getBinding("items");
             oBinding.filter(aFilters);
         },
 
+        /* ============================================================ */
+        /*  GVR FRAGMENT TOGGLE FILTERS                                  */
+        /* ============================================================ */
 
         onToggleFilters: function () {
-            var oFilterBox = this.byId(this.getView().getId() + "--filterBox");
-            var oBtn = this.byId(this.getView().getId() + "--toggleFilterBtn");
-            var bVisible = oFilterBox.getVisible();
+            var sViewId    = this.getView().getId();
+            var oFilterBox = Fragment.byId(sViewId, "filterBox");
+            var oBtn       = Fragment.byId(sViewId, "toggleFilterBtn");
+            var bVisible   = oFilterBox.getVisible();
 
             oFilterBox.setVisible(!bVisible);
             oBtn.setText(bVisible ? "Show Filters" : "Hide Filters");
         },
 
+        /* ============================================================ */
+        /*  GVR FRAGMENT ITEM SELECT                                     */
+        /* ============================================================ */
 
         onGVRSelect: function (oEvent) {
-            var oItem = oEvent.getParameter("listItem");
+            var oItem    = oEvent.getParameter("listItem");
             var oContext = oItem.getBindingContext();
-            var sGVRNo = oContext.getProperty("gv_no");
+            var sGVRNo   = oContext.getProperty("gv_no");
 
-            console.log("GVR Selected:", sGVRNo);
-            console.log("GVR type    :", oContext.getProperty("gvr_type_code"));
+            console.log("GVR Selected:", sGVRNo, "| Type:", oContext.getProperty("gvr_type_code"));
 
             this.byId("GVRInput").setValue(sGVRNo);
             this._gvrValueHelpDialog.close();
         },
 
         onGVRCancel: function () {
-            this._gvrValueHelpDialog.close();
+            if (this._gvrValueHelpDialog) {
+                this._gvrValueHelpDialog.close();
+            }
         }
+
     });
 });

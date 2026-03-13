@@ -2,57 +2,212 @@
     controllerName="gvtracker.controller.HomeScreen"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
->
+    xmlns:f="sap.ui.layout.form"
+    xmlns:core="sap.ui.core">
+
     <Page
         id="page"
-        title="Gift Voucher Tracker - Customer GIft issue Selection screen"
-    >
+        title="Gift Voucher Tracker"
+        showNavButton="false">
+
         <headerContent>
-            <Button text="User Profile" />
+            <Button
+                icon="sap-icon://person-placeholder"
+                text="User Profile"
+                type="Transparent"/>
         </headerContent>
 
         <content>
+
+        
             <VBox
-                class="sapUiMarginSmall"
-                alignItems="Center"
-            >
+                class="sapUiMediumMarginTop sapUiMediumMarginBottom"
+                alignItems="Center">
+                <core:Icon
+                    src="sap-icon://gift"
+                    size="3rem"
+                    color="@sapUiHighlight"
+                    class="sapUiSmallMarginBottom"/>
+                <Title
+                    text="Gift Voucher Activity"
+                    level="H2"
+                    class="sapUiSmallMarginBottom"/>
+                <Text
+                    text="Select an activity mode and execute to proceed"
+                    class="sapUiSmallMarginBottom"/>
+            </VBox>
+
+  
+            <VBox alignItems="Center">
+                <Panel
+                    width="520px"
+                    expandable="false"
+                    class="sapUiMediumMarginBottom">
+
+                    <headerToolbar>
+                        <Toolbar>
+                            <core:Icon src="sap-icon://action-settings" class="sapUiSmallMarginBegin"/>
+                            <Title text="Activity Selection" level="H4" class="sapUiSmallMarginBegin"/>
+                        </Toolbar>
+                    </headerToolbar>
+
+                    <content>
+                        <VBox class="sapUiMediumMargin">
+
+                     
+                            <f:SimpleForm
+                                layout="ResponsiveGridLayout"
+                                columnsXL="1"
+                                columnsL="1"
+                                columnsM="1"
+                                editable="false"
+                                class="sapUiNoMargin">
+                                <f:content>
+                                    <Label text="Activity Mode :" design="Bold"/>
+                                    <RadioButtonGroup
+                                        id="modeSelect"
+                                        selectedIndex="0"
+                                        columns="4"
+                                        select="onModeSelect">
+                                        <buttons>
+                                            <RadioButton text="CREATE"/>
+                                            <RadioButton text="RETURN"/>
+                                            <RadioButton text="REPLACEMENT"/>
+                                            <RadioButton text="DISPLAY"/>
+                                        </buttons>
+                                    </RadioButtonGroup>
+                                </f:content>
+                            </f:SimpleForm>
+
+                            <core:HTML content="&lt;div style='border-top: 1px solid #e0e0e0; margin: 12px 0;'&gt;&lt;/div&gt;"/>
+
+                            <f:SimpleForm
+                                layout="ResponsiveGridLayout"
+                                columnsXL="1"
+                                columnsL="1"
+                                columnsM="1"
+                                editable="false"
+                                class="sapUiNoMargin">
+                                <f:content>
+                                    <Label text="GVR Number :" design="Bold"/>
+                                    <HBox alignItems="Center">
+                                        <Input
+                                            id="GVRInput"
+                                            width="300px"
+                                            placeholder="Not required for CREATE"
+                                            enabled="false"
+                                            showValueHelp="true"
+                                            valueHelpRequest="onGVRValueHelp"
+                                            valueLiveUpdate="true"/>
+                                    </HBox>
+                                </f:content>
+                            </f:SimpleForm>
+
+                            <core:HTML content="&lt;div style='border-top: 1px solid #e0e0e0; margin: 12px 0;'&gt;&lt;/div&gt;"/>
+
+                     
+                            <HBox justifyContent="End">
+                                <Button
+                                    text="Execute"
+                                    type="Emphasized"
+                                    icon="sap-icon://play"
+                                    press="OnExecute"
+                                    width="150px"/>
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
                 <HBox
-                    alignItems="Center"
-                    class="sapUiSmallMarginBottom"
                     justifyContent="Center"
-                >
-                    <Label
-                        text="GVR Number"
-                        width="120px"
-                    />
-                    <Input
-                        width="200px"
-                        placeholder="Enter GVR Number"
-                        id="GVRInput"
-                        enabled="false"
-                        showValueHelp="true"
-                        valueHelpRequest="onGVRValueHelp"
-                    />
-                    <Button
-                        text="Execute"
+                    wrap="Wrap"
+                    class="sapUiSmallMarginBottom">
+
+                    <GenericTile
+                        header="CREATE"
+                        subheader="Issue gifts to customer"
+                        class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom"
                         press="OnExecute"
-                        class="sapUiSmallMarginBegin"
-                    />
+                        tileContent="">
+                        <tileContent>
+                            <TileContent>
+                                <content>
+                                    <NumericContent
+                                        icon="sap-icon://add"
+                                        value=""
+                                        withMargin="false"/>
+                                </content>
+                            </TileContent>
+                        </tileContent>
+                    </GenericTile>
+
+                    <GenericTile
+                        header="RETURN"
+                        subheader="Process gift returns"
+                        class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom"
+                        press="OnExecute"
+                        tileContent="">
+                        <tileContent>
+                            <TileContent>
+                                <content>
+                                    <NumericContent
+                                        icon="sap-icon://undo"
+                                        value=""
+                                        withMargin="false"/>
+                                </content>
+                            </TileContent>
+                        </tileContent>
+                    </GenericTile>
+
+                    <GenericTile
+                        header="REPLACEMENT"
+                        subheader="Replace returned gifts"
+                        class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom"
+                        press="OnExecute"
+                        tileContent="">
+                        <tileContent>
+                            <TileContent>
+                                <content>
+                                    <NumericContent
+                                        icon="sap-icon://refresh"
+                                        value=""
+                                        withMargin="false"/>
+                                </content>
+                            </TileContent>
+                        </tileContent>
+                    </GenericTile>
+
+                    <GenericTile
+                        header="DISPLAY"
+                        subheader="View GVR records"
+                        class="sapUiSmallMarginBeginEnd sapUiSmallMarginBottom"
+                        press="OnExecute"
+                        tileContent="">
+                        <tileContent>
+                            <TileContent>
+                                <content>
+                                    <NumericContent
+                                        icon="sap-icon://detail-view"
+                                        value=""
+                                        withMargin="false"/>
+                                </content>
+                            </TileContent>
+                        </tileContent>
+                    </GenericTile>
+
                 </HBox>
 
-                <RadioButtonGroup
-                    id="modeSelect"
-                    selectedIndex="0"
-                    select="onModeSelect"
-                >
-                    <buttons>
-                        <RadioButton text="CREATE" />
-                        <RadioButton text="RETURN" />
-                        <RadioButton text="REPLACEMENT" />
-                        <RadioButton text="DISPLAY" />
-                    </buttons>
-                </RadioButtonGroup>
             </VBox>
         </content>
+
+        <footer>
+            <Toolbar>
+                <Text text="Shopping Mall : 8208" class="sapUiSmallMarginBegin"/>
+                <ToolbarSpacer/>
+                <Text text="Gift Voucher Tracker v1.0" class="sapUiSmallMarginEnd"/>
+            </Toolbar>
+        </footer>
+
     </Page>
 </mvc:View>

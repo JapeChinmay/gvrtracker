@@ -7,44 +7,161 @@ sap.ui.define([
 ], function (Controller, Filter, FilterOperator, MessageToast, MessageBox) {
     "use strict";
 
-    var FULL_EXPAND = "customer,bills/attachment,assignGiftVouchers/giftVoucher,campaign,returnGiftVouchers/giftVoucher,returnGiftVouchers/returnedGVHeader";
+    // GVR type codes
+    var GVR_TYPE = {
+        CREATE:      "CI",
+        RETURN:      "RT",
+        REPLACEMENT: "RP"
+    };
+
+    // Expand strings per mode
+    var EXPAND = {
+        CREATE:      "customer,assignGiftVouchers/giftVoucher,campaign",
+        RETURN:      "customer,returnGiftVouchers/giftVoucher,returnGiftVouchers/returnedGVHeader",
+        REPLACEMENT: "customer,assignGiftVouchers/giftVoucher,returnGiftVouchers/giftVoucher,returnGiftVouchers/returnedGVHeader,campaign"
+    };
 
     return Controller.extend("gvtracker.controller.DisplayScreen", {
 
+        /* ============================================================ */
+        /*  LIFECYCLE                                                     */
+        /* ============================================================ */
+
         onInit: function () {
-            var oRoute = this.getOwnerComponent().getRouter();
-            oRoute.getRoute("RouteDisplayScreen")
-                  .attachPatternMatched(this._onRouteMatched, this);
+            // Default mode = Create (index 0)
+            this._sCurrentMode = "CREATE";
+
+            var oRouter = this.getOwnerComponent().getRouter();
+            oRouter.getRoute("RouteDisplayScreen")
+                   .attachPatternMatched(this._onRouteMatched, this);
         },
 
         _onRouteMatched: function (oEvent) {
             var sGVR = oEvent.getParameter("arguments").gvr;
-            console.log("Display Screen - GVR:", sGVR);
-            this._sGVR = sGVR;
 
+            // Reset detail panel
+            this._clearDetailPanel();
+
+            // Reset radio to Create
+            this.byId("displayModeSelect").setSelectedIndex(0);
+            this._sCurrentMode = "CREATE";
+
+            // Reload GVR list for CREATE mode
+            this._reloadGVRList();
+
+            // If a GVR was passed via route, load it
             if (sGVR) {
-                this._loadAndSelectGVR(sGVR);
+                this._loadGVRByNumber(sGVR);
             }
         },
 
-        _loadAndSelectGVR: function (sGVR) {
-            var oModel = this.getView().getModel();
+        /* ============================================================ */
+        /*  RADIO BUTTON — MODE SWITCH                                   */
+        /* ============================================================ */
 
+        onDisplayModeSelect: function (oEvent) {
+            var iIndex = oEvent.getSource().getSelectedIndex();
+
+            if (iIndex === 0)      { this._sCurrentMode = "CREATE"; }
+            else if (iIndex === 1) { this._sCurrentMode = "RETURN"; }
+            else if (iIndex === 2) { this._sCurrentMode = "REPLACEMENT"; }
+
+            // Clear detail and reload filtered list
+            this._clearDetailPanel();
+            this._reloadGVRList();
+        },
+
+        /* ============================================================ */
+        /*  GVR LIST — load filtered by gvr_type_code                   */
+        /* ============================================================ */
+
+        _reloadGVRList: function () {
+            var oList    = this.byId("gvrList");
+            var oBinding = oList.getBinding("items");
+
+            if (!oBinding) { return; }
+
+            var sTypeCode = GVR_TYPE[this._sCurrentMode];
+            oBinding.filter([
+                new Filter("gvr_type_code", FilterOperator.EQ, sTypeCode)
+            ]);
+        },
+
+        /* ============================================================ */
+        /*  GVR LIST — search                                            */
+        /* ============================================================ */
+
+        onGVRListSearch: function (oEvent) {
+            var sQuery   = oEvent.getParameter("query") ||
+                           oEvent.getParameter("newValue") || "";
+            var oList    = this.byId("gvrList");
+            var oBinding = oList.getBinding("items");
+            var sTypeCode = GVR_TYPE[this._sCurrentMode];
+
+            var aFilters = [
+                new Filter("gvr_type_code", FilterOperator.EQ, sTypeCode)
+            ];
+
+            if (sQuery) {
+                aFilters.push(new Filter("gv_no", FilterOperator.Contains, sQuery));
+            }
+
+            oBinding.filter(aFilters);
+        },
+
+        /* ============================================================ */
+        /*  GVR LIST ITEM SELECT                                         */
+        /* ============================================================ */
+
+        onGVRItemSelect: function (oEvent) {
+            var oItem    = oEvent.getParameter("listItem");
+            var oContext = oItem.getBindingContext();
+            var sPath    = oContext.getPath();
+            var oModel   = this.getView().getModel();
+            var oView    = this.getView();
+
+            // Set header fields immediately from existing context
+            this._setDetailContext(oContext);
+
+            // Then do a deep-expand read to get nested data
+            oModel.read(sPath, {
+                urlParameters: {
+                    "$expand": EXPAND[this._sCurrentMode]
+                },
+                success: function () {
+                    // Re-set context after expanded data arrives
+                    this._setDetailContext(oContext);
+                    this._applyTableVisibility();
+                }.bind(this),
+                error: function (oErr) {
+                    console.error("Error loading GVR details:", oErr);
+                    MessageBox.error("Error loading GVR details.");
+                }
+            });
+        },
+
+        /* ============================================================ */
+        /*  LOAD GVR BY NUMBER (from route param)                        */
+        /* ============================================================ */
+
+        _loadGVRByNumber: function (sGVR) {
+            var oModel = this.getView().getModel();
             oModel.read("/GVHeaderSet", {
                 filters: [
                     new Filter("gv_no", FilterOperator.EQ, sGVR)
                 ],
                 urlParameters: {
-                    "$expand": FULL_EXPAND
+                    "$expand": EXPAND[this._sCurrentMode]
                 },
                 success: function (oData) {
-                    console.log(oData);
                     if (oData.results.length > 0) {
-                        var sPath = "/GVHeaderSet(guid'" + oData.results[0].ID + "')";
+                        var oResult = oData.results[0];
+                        var sPath   = "/GVHeaderSet(guid'" + oResult.ID + "')";
                         var oContext = oModel.getContext(sPath);
                         this._setDetailContext(oContext);
+                        this._applyTableVisibility();
                     } else {
-                        MessageToast.show("GVR Number not found: " + sGVR);
+                        MessageToast.show("GVR not found: " + sGVR);
                     }
                 }.bind(this),
                 error: function (oErr) {
@@ -54,142 +171,124 @@ sap.ui.define([
             });
         },
 
-
-        onGVRItemSelect: function (oEvent) {
-            var oContext = oEvent.getParameter("listItem").getBindingContext();
-            var sPath    = oContext.getPath();
-            var oModel   = this.getView().getModel();
-            var oView    = this.getView();
-
-   
-            this._setDetailFields(oContext);
-
-         
-            oModel.read(sPath, {
-                urlParameters: {
-                    "$expand": FULL_EXPAND
-                },
-                success: function (oData) {
-                    console.log(oData);
-                 
-                    oView.byId("giftItemsTable").setBindingContext(oContext);
-                },
-                error: function (oErr) {
-                    console.error("Error loading GVR details:", oErr);
-                }
-            });
-        },
-
-    
-        _setDetailFields: function (oContext) {
-            var oView = this.getView();
-            oView.byId("detailGVRNo").setBindingContext(oContext);
-            oView.byId("detailTotalValue").setBindingContext(oContext);
-            oView.byId("detailCustType").setBindingContext(oContext);
-            oView.byId("detailCustMobile").setBindingContext(oContext);
-            oView.byId("detailCampaign").setBindingContext(oContext);
-            oView.byId("detailGVRDate").setBindingContext(oContext);
-            oView.byId("detailEmployee").setBindingContext(oContext);
-            oView.byId("detailMall").setBindingContext(oContext);
-            oView.byId("detailComments").setBindingContext(oContext);
-        },
+        /* ============================================================ */
+        /*  SET DETAIL CONTEXT — binds all detail controls               */
+        /* ============================================================ */
 
         _setDetailContext: function (oContext) {
-            this._setDetailFields(oContext);
-            this.getView().byId("giftItemsTable").setBindingContext(oContext);
-             this.getView().byId("returnGiftItemsTable").setBindingContext(oContext);
+            var oView = this.getView();
+            var aIds  = [
+                "detailGVRNo", "detailGVRType", "detailTotalAssignValue",
+                "detailTotalReturnValue", "detailCustType", "detailCustMobile",
+                "detailCampaign", "detailGVRDate", "detailEmployee",
+                "detailMall", "detailComments"
+            ];
+
+            aIds.forEach(function (sId) {
+                var oCtrl = oView.byId(sId);
+                if (oCtrl) { oCtrl.setBindingContext(oContext); }
+            });
+
+            // Bind tables
+            oView.byId("assignGiftItemsTable").setBindingContext(oContext);
+            oView.byId("returnGiftItemsTable").setBindingContext(oContext);
+
+            this._applyTableVisibility();
         },
 
-        onGVRListSearch: function (oEvent) {
-            var sQuery   = oEvent.getParameter("query") ||
-                           oEvent.getParameter("newValue") || "";
-            var oList    = this.byId("gvrList");
-            var oBinding = oList.getBinding("items");
-            var aFilters = [];
+        /* ============================================================ */
+        /*  TABLE VISIBILITY per mode                                    */
+        /* ============================================================ */
 
-            if (sQuery) {
-                aFilters.push(new Filter("gv_no", FilterOperator.Contains, sQuery));
-            }
+        _applyTableVisibility: function () {
+            var oView = this.getView();
+            var sMode = this._sCurrentMode;
 
-            oBinding.filter(aFilters);
+            // Titles
+            oView.byId("assignTableTitle").setVisible(
+                sMode === "CREATE" || sMode === "REPLACEMENT"
+            );
+            oView.byId("returnTableTitle").setVisible(
+                sMode === "RETURN" || sMode === "REPLACEMENT"
+            );
+
+            // Tables
+            oView.byId("assignGiftItemsTable").setVisible(
+                sMode === "CREATE" || sMode === "REPLACEMENT"
+            );
+            oView.byId("returnGiftItemsTable").setVisible(
+                sMode === "RETURN" || sMode === "REPLACEMENT"
+            );
+
+            // Total fields — show relevant one
+            oView.byId("lblTotalAssign").setVisible(
+                sMode === "CREATE" || sMode === "REPLACEMENT"
+            );
+            oView.byId("detailTotalAssignValue").setVisible(
+                sMode === "CREATE" || sMode === "REPLACEMENT"
+            );
+            oView.byId("lblTotalReturn").setVisible(
+                sMode === "RETURN" || sMode === "REPLACEMENT"
+            );
+            oView.byId("detailTotalReturnValue").setVisible(
+                sMode === "RETURN" || sMode === "REPLACEMENT"
+            );
+
+            // Campaign only shown for CREATE and REPLACEMENT
+            oView.byId("lblCampaign").setVisible(
+                sMode === "CREATE" || sMode === "REPLACEMENT"
+            );
+            oView.byId("detailCampaign").setVisible(
+                sMode === "CREATE" || sMode === "REPLACEMENT"
+            );
+
+            // View Bill Info button only for CREATE
+            oView.byId("viewBillInfoBtn").setVisible(sMode === "CREATE");
         },
+
+        /* ============================================================ */
+        /*  CLEAR DETAIL PANEL                                           */
+        /* ============================================================ */
+
+        _clearDetailPanel: function () {
+            var oView = this.getView();
+            var aIds  = [
+                "detailGVRNo", "detailGVRType", "detailTotalAssignValue",
+                "detailTotalReturnValue", "detailCustType", "detailCustMobile",
+                "detailCampaign", "detailGVRDate", "detailEmployee",
+                "detailMall", "detailComments"
+            ];
+            aIds.forEach(function (sId) {
+                var oCtrl = oView.byId(sId);
+                if (oCtrl) { oCtrl.setBindingContext(null); }
+            });
+            oView.byId("assignGiftItemsTable").setBindingContext(null);
+            oView.byId("returnGiftItemsTable").setBindingContext(null);
+        },
+
+        /* ============================================================ */
+        /*  VIEW BILL INFO                                                */
+        /* ============================================================ */
 
         onViewBillInfo: function () {
-            var sGVRNo = this.byId("detailGVRNo").getText();
-            if (!sGVRNo) {
+            var oContext = this.byId("detailGVRNo").getBindingContext();
+            if (!oContext) {
                 MessageToast.show("Please select a GVR first.");
                 return;
             }
-
-            var oModel = this.getView().getModel();
-            oModel.read("/GVHeaderSet", {
-                filters: [
-                    new Filter("gv_no", FilterOperator.EQ, sGVRNo)
-                ],
-                urlParameters: {
-                    "$expand": "bills/attachment"
-                },
-                success: function (oData) {
-                    console.log("Bill Info:", oData.results);
-                    MessageToast.show("Bills loaded. Check console.");
-                }.bind(this),
-                error: function (oErr) {
-                    console.error("Bill info error:", oErr);
-                }
+            var sGVRID = oContext.getObject().ID;
+            this.getOwnerComponent().getRouter().navTo("RouteViewBillInfoScreen", {
+                custID: sGVRID
             });
         },
 
-      onDisplayModeSelect: function (oEvent) {
-    var iIndex = oEvent.getSource().getSelectedIndex();
-    var oView  = this.getView();
-
-    if (iIndex === 0) {
-       
-        oView.byId("giftItemsTable").setVisible(true);
-        oView.byId("giftTableTitle").setText("Gift Items list issued to Customer");
-        oView.byId("returnGiftItemsTable").setVisible(false);
-        oView.byId("returnGiftTableTitle").setVisible(false);
-
-    } else if (iIndex === 1) {
-     
-        oView.byId("giftItemsTable").setVisible(false);
-        oView.byId("giftTableTitle").setText("");
-        oView.byId("returnGiftItemsTable").setVisible(true);
-        oView.byId("returnGiftTableTitle").setVisible(true);
-
-    } else if (iIndex === 2) {
-       
-        oView.byId("giftItemsTable").setVisible(true);
-        oView.byId("giftTableTitle").setText("Replacement Gift Items");
-        oView.byId("returnGiftItemsTable").setVisible(false);
-        oView.byId("returnGiftTableTitle").setVisible(false);
-    }
-},
+        /* ============================================================ */
+        /*  NAVIGATION                                                    */
+        /* ============================================================ */
 
         onHome: function () {
             this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");
-        },
-
-          onViewBillInfo:function() {
-
-                var oContext =  this.byId("detailGVRNo").getBindingContext();
-                if(!oContext) { MessageBox.Show('Please Select the GVR No');
-                    return;
-
-
-                }
-  
-                  var GVRID= this.byId("detailGVRNo").getBindingContext().getObject().ID;
-
-
-
-             
-               var route = this.getOwnerComponent().getRouter();
-               route.navTo('RouteViewBillInfoScreen', {
-                  custID:GVRID
-               });
-
-          }
+        }
 
     });
 });
