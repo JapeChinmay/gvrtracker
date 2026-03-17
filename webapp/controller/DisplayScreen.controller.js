@@ -14,7 +14,6 @@ sap.ui.define([
         REPLACEMENT: "RP"
     };
 
-    // Expand strings per mode
     var EXPAND = {
         CREATE:      "customer,assignGiftVouchers/giftVoucher,campaign",
         RETURN:      "customer,returnGiftVouchers/giftVoucher,returnGiftVouchers/returnedGVHeader",
@@ -23,12 +22,10 @@ sap.ui.define([
 
     return Controller.extend("gvtracker.controller.DisplayScreen", {
 
-        /* ============================================================ */
-        /*  LIFECYCLE                                                     */
-        /* ============================================================ */
+    
 
         onInit: function () {
-            // Default mode = Create (index 0)
+    
             this._sCurrentMode = "CREATE";
 
             var oRouter = this.getOwnerComponent().getRouter();
@@ -39,25 +36,23 @@ sap.ui.define([
         _onRouteMatched: function (oEvent) {
             var sGVR = oEvent.getParameter("arguments").gvr;
 
-            // Reset detail panel
+         
             this._clearDetailPanel();
 
-            // Reset radio to Create
+       
             this.byId("displayModeSelect").setSelectedIndex(0);
             this._sCurrentMode = "CREATE";
 
-            // Reload GVR list for CREATE mode
+          
             this._reloadGVRList();
 
-            // If a GVR was passed via route, load it
+      
             if (sGVR) {
                 this._loadGVRByNumber(sGVR);
             }
         },
 
-        /* ============================================================ */
-        /*  RADIO BUTTON — MODE SWITCH                                   */
-        /* ============================================================ */
+
 
         onDisplayModeSelect: function (oEvent) {
             var iIndex = oEvent.getSource().getSelectedIndex();
@@ -71,9 +66,6 @@ sap.ui.define([
             this._reloadGVRList();
         },
 
-        /* ============================================================ */
-        /*  GVR LIST — load filtered by gvr_type_code                   */
-        /* ============================================================ */
 
         _reloadGVRList: function () {
             var oList    = this.byId("gvrList");
@@ -87,9 +79,7 @@ sap.ui.define([
             ]);
         },
 
-        /* ============================================================ */
-        /*  GVR LIST — search                                            */
-        /* ============================================================ */
+   
 
         onGVRListSearch: function (oEvent) {
             var sQuery   = oEvent.getParameter("query") ||
@@ -109,9 +99,6 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        /* ============================================================ */
-        /*  GVR LIST ITEM SELECT                                         */
-        /* ============================================================ */
 
         onGVRItemSelect: function (oEvent) {
             var oItem    = oEvent.getParameter("listItem");
@@ -120,16 +107,15 @@ sap.ui.define([
             var oModel   = this.getView().getModel();
             var oView    = this.getView();
 
-            // Set header fields immediately from existing context
             this._setDetailContext(oContext);
 
-            // Then do a deep-expand read to get nested data
+         
             oModel.read(sPath, {
                 urlParameters: {
                     "$expand": EXPAND[this._sCurrentMode]
                 },
                 success: function () {
-                    // Re-set context after expanded data arrives
+               
                     this._setDetailContext(oContext);
                     this._applyTableVisibility();
                 }.bind(this),
@@ -140,9 +126,7 @@ sap.ui.define([
             });
         },
 
-        /* ============================================================ */
-        /*  LOAD GVR BY NUMBER (from route param)                        */
-        /* ============================================================ */
+
 
         _loadGVRByNumber: function (sGVR) {
             var oModel = this.getView().getModel();
@@ -171,9 +155,7 @@ sap.ui.define([
             });
         },
 
-        /* ============================================================ */
-        /*  SET DETAIL CONTEXT — binds all detail controls               */
-        /* ============================================================ */
+     
 
         _setDetailContext: function (oContext) {
             var oView = this.getView();
@@ -196,9 +178,7 @@ sap.ui.define([
             this._applyTableVisibility();
         },
 
-        /* ============================================================ */
-        /*  TABLE VISIBILITY per mode                                    */
-        /* ============================================================ */
+ 
 
         _applyTableVisibility: function () {
             var oView = this.getView();
@@ -246,9 +226,7 @@ sap.ui.define([
             oView.byId("viewBillInfoBtn").setVisible(sMode === "CREATE");
         },
 
-        /* ============================================================ */
-        /*  CLEAR DETAIL PANEL                                           */
-        /* ============================================================ */
+    
 
         _clearDetailPanel: function () {
             var oView = this.getView();
@@ -266,9 +244,6 @@ sap.ui.define([
             oView.byId("returnGiftItemsTable").setBindingContext(null);
         },
 
-        /* ============================================================ */
-        /*  VIEW BILL INFO                                                */
-        /* ============================================================ */
 
         onViewBillInfo: function () {
             var oContext = this.byId("detailGVRNo").getBindingContext();
@@ -281,10 +256,6 @@ sap.ui.define([
                 custID: sGVRID
             });
         },
-
-        /* ============================================================ */
-        /*  NAVIGATION                                                    */
-        /* ============================================================ */
 
         onHome: function () {
             this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");

@@ -119,7 +119,7 @@
                     </content>
                 </Panel>
 
-                <HBox
+                <!-- <HBox
                     justifyContent="Center"
                     wrap="Wrap"
                     class="sapUiSmallMarginBottom">
@@ -196,7 +196,7 @@
                         </tileContent>
                     </GenericTile>
 
-                </HBox>
+                </HBox> -->
 
             </VBox>
         </content>

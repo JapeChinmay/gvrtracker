@@ -3,50 +3,51 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
-    xmlns:core="sap.ui.core">
-
+    xmlns:core="sap.ui.core"
+>
     <Page title="Gift Voucher Tracker - Display Screen">
-
         <headerContent>
-            <Button text="Home" icon="sap-icon://home" press="onHome"/>
+            <Button
+                text="Home"
+                icon="sap-icon://home"
+                press="onHome"
+            />
         </headerContent>
 
-        <!-- ═══════════════════════════════════════════════════════════ -->
-        <!-- SUB HEADER: Mode Radio Buttons                              -->
-        <!-- ═══════════════════════════════════════════════════════════ -->
         <subHeader>
             <Toolbar>
-                <ToolbarSpacer/>
+                <ToolbarSpacer />
                 <RadioButtonGroup
                     id="displayModeSelect"
                     selectedIndex="0"
                     columns="3"
-                    select="onDisplayModeSelect">
+                    select="onDisplayModeSelect"
+                >
                     <buttons>
-                        <RadioButton text="Create"/>
-                        <RadioButton text="Return"/>
-                        <RadioButton text="Replacement"/>
+                        <RadioButton text="Create" />
+                        <RadioButton text="Return" />
+                        <RadioButton text="Replacement" />
                     </buttons>
                 </RadioButtonGroup>
-                <ToolbarSpacer/>
+                <ToolbarSpacer />
             </Toolbar>
         </subHeader>
 
         <content>
-            <HBox height="100%" width="100%">
-
-                <!-- ═══════════════════════════════════════════════ -->
-                <!-- LEFT PANEL: GVR List                            -->
-                <!-- ═══════════════════════════════════════════════ -->
+            <HBox
+                height="100%"
+                width="100%"
+            >
                 <VBox
                     width="25%"
                     class="sapUiSmallMargin"
-                    fitContainer="true">
-
+                    fitContainer="true"
+                >
                     <Title
                         text="GVR Numbers"
                         level="H4"
-                        class="sapUiSmallMarginBottom"/>
+                        class="sapUiSmallMarginBottom"
+                    />
 
                     <SearchField
                         id="gvrListSearch"
@@ -54,7 +55,8 @@
                         search="onGVRListSearch"
                         liveChange="onGVRListSearch"
                         width="100%"
-                        class="sapUiSmallMarginBottom"/>
+                        class="sapUiSmallMarginBottom"
+                    />
 
                     <List
                         id="gvrList"
@@ -72,78 +74,132 @@
                                 path: 'createdAt',
                                 descending: true
                             }
-                        }">
+                        }"
+                    >
                         <StandardListItem
                             title="{gv_no}"
                             description="{customer/phone}"
-                            info="{createdAt}"
-                            type="Active"/>
+                            info="{
+  path: 'createdAt',
+  type: 'sap.ui.model.type.Date',
+  formatOptions: {
+    pattern: 'dd/MM/yyyy'
+  }
+}"
+                            type="Active"
+                        />
                     </List>
-
                 </VBox>
 
-                <!-- ═══════════════════════════════════════════════ -->
-                <!-- RIGHT PANEL: GVR Details                        -->
-                <!-- ═══════════════════════════════════════════════ -->
                 <VBox
                     width="75%"
                     class="sapUiSmallMargin"
-                    fitContainer="true">
-
+                    fitContainer="true"
+                >
                     <Title
                         text="GVR Details"
                         level="H4"
-                        class="sapUiSmallMarginBottom"/>
+                        class="sapUiSmallMarginBottom"
+                    />
 
-                    <!-- Header Info -->
                     <f:SimpleForm
                         layout="ResponsiveGridLayout"
                         columnsXL="4"
                         columnsL="4"
                         columnsM="2"
-                        editable="false">
+                        editable="false"
+                    >
                         <f:content>
+                            <Label text="GVR Number :" />
+                            <Text
+                                id="detailGVRNo"
+                                text="{gv_no}"
+                            />
 
-                            <Label text="GVR Number :"/>
-                            <Text id="detailGVRNo" text="{gv_no}"/>
+                            <Label text="GVR Type :" />
+                            <Text
+                                id="detailGVRType"
+                                text="{gvr_type_code}"
+                            />
 
-                            <Label text="GVR Type :"/>
-                            <Text id="detailGVRType" text="{gvr_type_code}"/>
+                            <Label
+                                id="lblTotalAssign"
+                                text="Total Assign Value :"
+                            />
+                            <Text
+                                id="detailTotalAssignValue"
+                                text="{assignGiftsTotal_amt}"
+                            />
 
-                            <Label id="lblTotalAssign" text="Total Assign Value :"/>
-                            <Text id="detailTotalAssignValue" text="{assignGiftsTotal_amt}"/>
+                            <Label
+                                id="lblTotalReturn"
+                                text="Total Return Value :"
+                            />
+                            <Text
+                                id="detailTotalReturnValue"
+                                text="{returnGiftsTotal_amt}"
+                            />
 
-                            <Label id="lblTotalReturn" text="Total Return Value :"/>
-                            <Text id="detailTotalReturnValue" text="{returnGiftsTotal_amt}"/>
+                            <Label text="Customer Type :" />
+                            <Text
+                                id="detailCustType"
+                                text="{cust_type_code}"
+                            />
 
-                            <Label text="Customer Type :"/>
-                            <Text id="detailCustType" text="{cust_type_code}"/>
+                            <Label text="Customer Mobile :" />
+                            <Text
+                                id="detailCustMobile"
+                                text="{customer/phone}"
+                            />
 
-                            <Label text="Customer Mobile :"/>
-                            <Text id="detailCustMobile" text="{customer/phone}"/>
+                            <Label
+                                id="lblCampaign"
+                                text="Campaign :"
+                            />
+                            <Text
+                                id="detailCampaign"
+                                text="{campaign/name}"
+                            />
 
-                            <Label id="lblCampaign" text="Campaign :"/>
-                            <Text id="detailCampaign" text="{campaign/name}"/>
+                            <Label text="GVR Date :" />
+                            <Text
+                                id="detailGVRDate"
+                             text="{
+  path: 'createdAt',
+  type: 'sap.ui.model.type.Date',
+  formatOptions: {
+    pattern: 'dd/MM/yyyy'
+  }
+}"
+                            />
 
-                            <Label text="GVR Date :"/>
-                            <Text id="detailGVRDate" text="{createdAt}"/>
+                            <Label text="Employee ID / Name :" />
+                            <Text
+                                id="detailEmployee"
+                                text="{employee_code}"
+                            />
 
-                            <Label text="Employee ID / Name :"/>
-                            <Text id="detailEmployee" text="{employee_code}"/>
-
-                            <Label text="Shopping Mall :"/>
-                            <Text id="detailMall" text="{shoppingMall_plant_code}"/>
-
+                            <Label text="Shopping Mall :" />
+                            <Text
+                                id="detailMall"
+                                text="{shoppingMall_plant_code}"
+                            />
                         </f:content>
                     </f:SimpleForm>
 
                     <!-- Comments -->
-                    <HBox class="sapUiSmallMarginTop sapUiSmallMarginBottom" alignItems="Center">
-                        <Label text="Comments :"/>
-                        <Text id="detailComments" text="{comment}" class="sapUiSmallMarginBegin"/>
+                    <HBox
+                        class="sapUiSmallMarginTop sapUiSmallMarginBottom"
+                        alignItems="Center"
+                    >
+                        <Label text="Comments :" />
+                        <Text
+                            id="detailComments"
+                            text="{comment}"
+                            class="sapUiSmallMarginBegin"
+                        />
                     </HBox>
 
-                    <!-- View Bill Info Button — only visible for Create mode -->
                     <Button
                         id="viewBillInfoBtn"
                         text="View Customer Bill Info"
@@ -151,113 +207,147 @@
                         type="Transparent"
                         class="sapUiSmallMarginBottom"
                         press="onViewBillInfo"
-                        visible="true"/>
+                        visible="true"
+                    />
 
-                    <!-- ─────────────────────────────────────────── -->
-                    <!-- TABLE: Assigned Gift Items                   -->
-                    <!-- Shown for CREATE and REPLACEMENT             -->
-                    <!-- ─────────────────────────────────────────── -->
                     <Title
                         id="assignTableTitle"
                         text="Gift Items Issued to Customer"
                         level="H4"
                         class="sapUiMediumMarginTop sapUiSmallMarginBottom"
-                        visible="true"/>
+                        visible="true"
+                    />
 
                     <Table
                         id="assignGiftItemsTable"
                         inset="false"
                         visible="true"
                         noDataText="No assigned gift items"
-                        items="{path: 'assignGiftVouchers'}">
-
+                        items="{path: 'assignGiftVouchers'}"
+                    >
                         <columns>
-                            <Column width="150px"><Text text="Material Name"/></Column>
-                            <Column width="180px"><Text text="Description"/></Column>
-                            <Column width="100px"><Text text="Price"/></Column>
-                            <Column width="90px" ><Text text="Issue Qty"/></Column>
-                            <Column width="160px"><Text text="Coupon"/></Column>
-                            <Column width="120px"><Text text="Brand"/></Column>
-                            <Column width="130px"><Text text="Expiry Date"/></Column>
-                            <Column width="120px"><Text text="Total Amount"/></Column>
+                            <Column width="150px">
+                                <Text text="Material Name" />
+                            </Column>
+                            <Column width="180px">
+                                <Text text="Description" />
+                            </Column>
+                            <Column width="100px">
+                                <Text text="Price" />
+                            </Column>
+                            <Column width="90px">
+                                <Text text="Issue Qty" />
+                            </Column>
+                            <Column width="160px">
+                                <Text text="Coupon" />
+                            </Column>
+                            <Column width="120px">
+                                <Text text="Brand" />
+                            </Column>
+                            <Column width="130px">
+                                <Text text="Expiry Date" />
+                            </Column>
+                            <Column width="120px">
+                                <Text text="Total Amount" />
+                            </Column>
                         </columns>
 
                         <items>
                             <ColumnListItem type="Inactive">
                                 <cells>
-                                    <Text text="{giftVoucher/material}"/>
-                                    <Text text="{giftVoucher/descr}"/>
-                                    <Text text="{giftVoucher/price}"/>
-                                    <Text text="{issue_quantity}"/>
-                                    <Text text="{giftVoucher/coupon}"/>
-                                    <Text text="{giftVoucher/brand}"/>
-                                    <Text text="{giftVoucher/expDate}"/>
-                                    <Text text="{total_amount}"/>
+                                    <Text text="{giftVoucher/material}" />
+                                    <Text text="{giftVoucher/descr}" />
+                                    <Text text="{giftVoucher/price}" />
+                                    <Text text="{issue_quantity}" />
+                                    <Text text="{giftVoucher/coupon}" />
+                                    <Text text="{giftVoucher/brand}" />
+                                    <Text text="{giftVoucher/expDate}" />
+                                    <Text text="{total_amount}" />
                                 </cells>
                             </ColumnListItem>
                         </items>
-
                     </Table>
 
-                    <!-- ─────────────────────────────────────────── -->
-                    <!-- TABLE: Returned Gift Items                   -->
-                    <!-- Shown for RETURN and REPLACEMENT             -->
-                    <!-- ─────────────────────────────────────────── -->
                     <Title
                         id="returnTableTitle"
                         text="Gift Items Returned by Customer"
                         level="H4"
                         class="sapUiMediumMarginTop sapUiSmallMarginBottom"
-                        visible="false"/>
+                        visible="false"
+                    />
 
                     <Table
                         id="returnGiftItemsTable"
                         inset="false"
                         visible="false"
                         noDataText="No returned gift items"
-                        items="{path: 'returnGiftVouchers'}">
-
+                        items="{path: 'returnGiftVouchers'}"
+                    >
                         <columns>
-                            <Column width="150px"><Text text="Material Name"/></Column>
-                            <Column width="180px"><Text text="Description"/></Column>
-                            <Column width="100px"><Text text="Price"/></Column>
-                            <Column width="100px"><Text text="Return Qty"/></Column>
-                            <Column width="160px"><Text text="Coupon"/></Column>
-                            <Column width="120px"><Text text="Brand"/></Column>
-                            <Column width="130px"><Text text="Expiry Date"/></Column>
-                            <Column width="150px"><Text text="Original GVR"/></Column>
-                            <Column width="120px"><Text text="Total Amount"/></Column>
+                            <Column width="150px">
+                                <Text text="Material Name" />
+                            </Column>
+                            <Column width="180px">
+                                <Text text="Description" />
+                            </Column>
+                            <Column width="100px">
+                                <Text text="Price" />
+                            </Column>
+                            <Column width="100px">
+                                <Text text="Return Qty" />
+                            </Column>
+                            <Column width="160px">
+                                <Text text="Coupon" />
+                            </Column>
+                            <Column width="120px">
+                                <Text text="Brand" />
+                            </Column>
+                            <Column width="130px">
+                                <Text text="Expiry Date" />
+                            </Column>
+                            <Column width="150px">
+                                <Text text="Original GVR" />
+                            </Column>
+                            <Column width="120px">
+                                <Text text="Total Amount" />
+                            </Column>
                         </columns>
 
                         <items>
                             <ColumnListItem type="Inactive">
                                 <cells>
-                                    <Text text="{giftVoucher/material}"/>
-                                    <Text text="{giftVoucher/descr}"/>
-                                    <Text text="{giftVoucher/price}"/>
-                                    <Text text="{issue_quantity}"/>
-                                    <Text text="{giftVoucher/coupon}"/>
-                                    <Text text="{giftVoucher/brand}"/>
-                                    <Text text="{giftVoucher/expDate}"/>
-                                    <Text text="{returnedGVHeader/gv_no}"/>
-                                    <Text text="{total_amount}"/>
+                                    <Text text="{giftVoucher/material}" />
+                                    <Text text="{giftVoucher/descr}" />
+                                    <Text text="{giftVoucher/price}" />
+                                    <Text text="{issue_quantity}" />
+                                    <Text text="{giftVoucher/coupon}" />
+                                    <Text text="{giftVoucher/brand}" />
+                              <Text text="{
+  path: 'giftVoucher/expDate',
+  type: 'sap.ui.model.type.Date',
+  formatOptions: {
+    pattern: 'dd/MM/yyyy'
+  }
+}" />
+                                    <Text text="{returnedGVHeader/gv_no}" />
+                                    <Text text="{total_amount}" />
                                 </cells>
                             </ColumnListItem>
                         </items>
-
                     </Table>
-
                 </VBox>
-
             </HBox>
         </content>
 
         <footer>
             <Toolbar>
-                <ToolbarSpacer/>
-                <Button text="Back" icon="sap-icon://nav-back" press="onHome"/>
+                <ToolbarSpacer />
+                <Button
+                    text="Back"
+                    icon="sap-icon://nav-back"
+                    press="onHome"
+                />
             </Toolbar>
         </footer>
-
     </Page>
 </mvc:View>

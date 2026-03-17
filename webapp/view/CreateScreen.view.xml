@@ -2,88 +2,136 @@
     controllerName="gvtracker.controller.CreateScreen"
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-
-    <Page title="Gift Voucher Tracker-Gift Issue to Customer Activity - CREATE Screen">
-
+    xmlns:core="sap.ui.core"
+>
+    <Page
+        title="Gift Voucher Tracker-Gift Issue to Customer Activity - CREATE Screen"
+    >
         <content>
             <VBox class="sapUiMediumMargin">
-
                 <HBox justifyContent="SpaceBetween">
                     <VBox width="25%">
-                        <Label text="Shopping Mall"/>
-                        <Text text="8208"/>
+                        <Label text="Shopping Mall" />
+                        <Text text="8208" />
                     </VBox>
                     <VBox width="25%">
-                        <Label text="Customer Type"/>
-                        <Select width="100%" items="{path: '/CustTypes'}">
-                            <core:Item key="{code}" text="{name}"/>
+                        <Label text="Customer Type" />
+                        <Select
+                            width="100%"
+                            items="{path: '/CustTypes'}"
+                        >
+                            <core:Item
+                                key="{code}"
+                                text="{name}"
+                            />
                         </Select>
                     </VBox>
-                    <VBox width="25%" class="sapUiSmallMarginBegin">
-                        <Label text="Employee ID / Name"/>
-                        <Input value="102312"/>
+                    <VBox
+                        width="25%"
+                        class="sapUiSmallMarginBegin"
+                    >
+                        <Label text="Employee ID / Name" />
+                        <Input value="102312" />
                     </VBox>
-                    <VBox width="25%" class="sapUiLargeMarginBegin">
-                        <Label text="GVR Date"/>
-                        <Text text="09/03/2026" id="GVRDate" />
+                    <VBox
+                        width="25%"
+                        class="sapUiLargeMarginBegin"
+                    >
+                        <Label text="GVR Date" />
+                        <Text
+                            text="09/03/2026"
+                            id="GVRDate"
+                        />
                     </VBox>
                 </HBox>
 
-                <HBox justifyContent="SpaceBetween" class="sapUiSmallMarginTop">
-
-              
+                <HBox
+                    justifyContent="SpaceBetween"
+                    class="sapUiSmallMarginTop"
+                >
                     <VBox width="25%">
-                        <Label text="Total Assign Items Value"/>
-                        <Text id="totalAssignValue" text="0.00"/>
+                        <Label text="Total Assign Items Value" />
+                        <Text
+                            id="totalAssignValue"
+                            text="0.00"
+                        />
                     </VBox>
 
                     <VBox width="25%">
-                        <Label text="Customer Mobile" required="true"/>
+                        <Label
+                            text="Customer Mobile"
+                            required="true"
+                        />
                         <Input
                             placeholder="Enter mobile"
-                            id="mobileInput"
+                            id="mobileCustomerInput"
                             showValueHelp="true"
                             valueHelpRequest="onMobileValueHelp"
                             valueHelpIconSrc="sap-icon://copy"
-                            liveChange="onMobileChange"/>
+                            liveChange="onMobileChange"
+                        />
                     </VBox>
 
-                    <VBox width="25%" class="sapUiSmallMarginBegin">
-                        <Label text="Campaign" required="true"/>
+                    <VBox
+                        width="25%"
+                        class="sapUiSmallMarginBegin"
+                    >
+                        <Label
+                            text="Campaign"
+                            required="true"
+                        />
                         <Input
                             placeholder="Campaign"
                             id="camPaignVlaueHelp"
                             showValueHelp="true"
-                            valueHelpRequest="onCampaignValueHelp"/>
+                            valueHelpRequest="onCampaignValueHelp"
+                        />
                     </VBox>
 
-                    <VBox width="25%" alignItems="Center" justifyContent="Center">
+                    <VBox
+                        width="25%"
+                        alignItems="Center"
+                        justifyContent="Center"
+                    >
                         <Button
                             text="Add Customer Profile"
                             width="200%"
                             class="sapUiTinyMarginBottom"
                             press="onAddCustomer"
-                            id="addCustInfo"/>
+                            id="addCustInfo"
+                        />
                         <Button
                             text="Add Customer Bill Info"
                             width="200%"
                             enabled="false"
                             class="sapUiTinyMarginTop"
                             id="custBillInfo"
-                            press="onAddCustomerBillInfo"/>
+                            press="onAddCustomerBillInfo"
+                        />
                     </VBox>
-
                 </HBox>
 
                 <VBox class="sapUiSmallMarginTop">
-                    <Label text="Comments"/>
-                    <TextArea width="100%" height="20px"/>
+                    <Label text="Comments" />
+                    <TextArea
+                        id="inputComments"
+                        width="100%"
+                        height="20px"
+                    />
 
                     <VBox class="sapUiMediumMarginTop">
-                        <HBox justifyContent="SpaceBetween" alignItems="Center">
-                            <Title text="Gift Item Details for Customer Issue" level="H4"/>
-                            <SearchField width="250px" placeholder="Search"/>
+                        <HBox
+                            justifyContent="SpaceBetween"
+                            alignItems="Center"
+                        >
+                            <Title
+                                text="Gift Item Details for Customer Issue"
+                                level="H4"
+                            />
+                            <SearchField
+                                width="250px"
+                                placeholder="Search"
+                            />
                         </HBox>
 
                         <Table
@@ -91,64 +139,90 @@
                             inset="false"
                             growing="true"
                             growingScrollToLoad="true"
-                            items="{/GiftVoucherSet}">
-
+                            items="{/GiftVoucherSet}"
+                        >
                             <columns>
-                                <Column width="3rem"/>
-                                <Column><Text text="Material Name"/></Column>
-                                <Column><Text text="Description"/></Column>
-                                <Column><Text text="Stock Qty"/></Column>
-                                <Column><Text text="Price"/></Column>
-                                <Column><Text text="Issue Qty"/></Column>
-                                <Column><Text text="Coupon"/></Column>
-                                <Column><Text text="Brand"/></Column>
-                                <Column><Text text="Expiry Date"/></Column>
+                                <Column width="3rem" />
+                                <Column>
+                                    <Text text="Material Name" />
+                                </Column>
+                                <Column>
+                                    <Text text="Description" />
+                                </Column>
+                                <Column>
+                                    <Text text="Stock Qty" />
+                                </Column>
+                                <Column>
+                                    <Text text="Price" />
+                                </Column>
+                                <Column>
+                                    <Text text="Issue Qty" />
+                                </Column>
+                                <Column>
+                                    <Text text="Coupon" />
+                                </Column>
+                                <Column>
+                                    <Text text="Brand" />
+                                </Column>
+                                <Column>
+                                    <Text text="Expiry Date" />
+                                </Column>
                             </columns>
 
                             <items>
                                 <ColumnListItem>
                                     <cells>
-
-                                    
                                         <CheckBox
                                             selected="false"
                                             enabled="{= ${stock} > 0 }"
-                                            select="onCheckBoxSelect"/>
+                                            select="onCheckBoxSelect"
+                                        />
 
-                                        <Text text="{material}"/>
-                                        <Text text="{descr}"/>
-                                        <Text text="{stock}"/>
-                                        <Text text="{price}"/>
+                                        <Text text="{material}" />
+                                        <Text text="{descr}" />
+                                        <Text text="{stock}" />
+                                        <Text text="{price}" />
 
-                                  
                                         <Input
                                             width="80px"
                                             value="1"
                                             enabled="{= ${stock} > 0 }"
-                                            liveChange="onIssueItemChange"/>
+                                            liveChange="onIssueItemChange"
+                                        />
 
-                                        <Text text="{coupon}"/>
-                                        <Text text="{brand}"/>
-                                        <Text text="{expDate}"/>
-
+                                        <Text text="{coupon}" />
+                                        <Text text="{brand}" />
+                                        <Text
+                                            text="{
+  path: 'expDate',
+  type: 'sap.ui.model.type.Date',
+  formatOptions: {
+    pattern: 'dd/MM/yyyy'
+  }
+}"
+                                        />
                                     </cells>
                                 </ColumnListItem>
                             </items>
-
                         </Table>
                     </VBox>
                 </VBox>
-
             </VBox>
         </content>
 
         <footer>
             <Toolbar>
-                <ToolbarSpacer/>
-                <Button text="Cancel" press="onCancel"/>
-                <Button text="Submit" type="Emphasized" press="onSubmit"/>
+                <ToolbarSpacer />
+                <Button
+                    text="Cancel"
+                    press="onCancel"
+                />
+                <Button
+                    text="Submit"
+                    type="Emphasized"
+                    press="onSubmit"
+                />
             </Toolbar>
         </footer>
-
     </Page>
 </mvc:View>

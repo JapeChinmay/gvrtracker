@@ -11,9 +11,7 @@ sap.ui.define([
 
     return Controller.extend("gvtracker.controller.ReplacementScreen", {
 
-        /* ============================================================ */
-        /*  LIFECYCLE                                                     */
-        /* ============================================================ */
+
 
         onInit: function () {
             var oRouter = this.getOwnerComponent().getRouter();
@@ -45,9 +43,6 @@ sap.ui.define([
             this.getView().setModel(new JSONModel({ items: [] }), "giftModel");
         },
 
-        /* ============================================================ */
-        /*  CUSTOMER VALUE HELP                                           */
-        /* ============================================================ */
 
         onMobileValueHelp: function () {
             var oView = this.getView();
@@ -98,9 +93,7 @@ sap.ui.define([
             this._loadAllData();
         },
 
-        /* ============================================================ */
-        /*  MOBILE LIVE CHANGE                                           */
-        /* ============================================================ */
+    
 
         onMobileChange: function (oEvent) {
             var sMobile = oEvent.getSource().getValue();
@@ -129,9 +122,7 @@ sap.ui.define([
             });
         },
 
-        /* ============================================================ */
-        /*  RESET HELPER                                                  */
-        /* ============================================================ */
+    
 
         _resetAllData: function () {
             this._fMaxAllowedAssign = 0;
@@ -143,18 +134,12 @@ sap.ui.define([
             this.byId("txtMall").setText("");
         },
 
-        /* ============================================================ */
-        /*  LOAD BOTH TABLES IN PARALLEL                                 */
-        /* ============================================================ */
 
         _loadAllData: function () {
             this._loadAssignedVouchers();
             this._loadGiftVouchers();
         },
 
-        /* ─────────────────────────────────────────────────────────── */
-        /*  TABLE 1 : GVHeaderSet (CI type) → TreeTable                 */
-        /* ─────────────────────────────────────────────────────────── */
 
         _loadAssignedVouchers: function () {
             var oModel = this.getView().getModel();
@@ -201,9 +186,7 @@ sap.ui.define([
             });
         },
 
-        /* ─────────────────────────────────────────────────────────── */
-        /*  TABLE 2 : GiftVoucherSet → flat Table                       */
-        /* ─────────────────────────────────────────────────────────── */
+    
 
         _loadGiftVouchers: function () {
             var oModel = this.getView().getModel();
@@ -242,9 +225,6 @@ sap.ui.define([
             });
         },
 
-        /* ============================================================ */
-        /*  BUILD TREE NODES FROM GVHEADERSET RESULTS                   */
-        /* ============================================================ */
 
         _buildTreeNodes: function (aResults) {
             return aResults.map(function (oHeader) {
@@ -293,9 +273,6 @@ sap.ui.define([
             }.bind(this));
         },
 
-        /* ============================================================ */
-        /*  DATE HELPER                                                   */
-        /* ============================================================ */
 
         _formatODataDate: function (oDateVal) {
             if (!oDateVal) { return ""; }
@@ -308,9 +285,7 @@ sap.ui.define([
             });
         },
 
-        /* ============================================================ */
-        /*  TREE TABLE TOOLBAR                                           */
-        /* ============================================================ */
+     
 
         onCollapseAll: function () {
             this.byId("assignedGiftsTree").collapseAll();
@@ -328,9 +303,6 @@ sap.ui.define([
         },
         onRowSelectionChange: function () { /* reserved */ },
 
-        /* ============================================================ */
-        /*  TABLE 1 : RETURN QTY CHANGE                                  */
-        /* ============================================================ */
 
         onReturnQtyChange: function (oEvent) {
             var oInput   = oEvent.getSource();
@@ -352,13 +324,10 @@ sap.ui.define([
             );
 
             this._recalculateReturnTotal();
-            // Reset assign total when return changes (budget changes)
+        
             this._recalculateAssignTotal();
         },
 
-        /* ============================================================ */
-        /*  CALCULATE TOTAL RETURN VALUE (from tree table)               */
-        /* ============================================================ */
 
         _recalculateReturnTotal: function () {
             var oTreeModel = this.getView().getModel("treeModel");
@@ -379,9 +348,6 @@ sap.ui.define([
             return fTotal;
         },
 
-        /* ============================================================ */
-        /*  TABLE 2 : GIFT SEARCH                                        */
-        /* ============================================================ */
 
         onGiftSearch: function (oEvent) {
             var sQuery = oEvent.getParameter("query") || oEvent.getParameter("newValue") || "";
@@ -406,9 +372,7 @@ sap.ui.define([
             this._recalculateAssignTotal();
         },
 
-        /* ============================================================ */
-        /*  TABLE 2 : ISSUE QTY CHANGE                                   */
-        /* ============================================================ */
+  
 
         onIssueQtyChange: function (oEvent) {
             var oInput   = oEvent.getSource();
@@ -432,10 +396,7 @@ sap.ui.define([
             this._recalculateAssignTotal();
         },
 
-        /* ============================================================ */
-        /*  CALCULATE TOTAL ASSIGN VALUE (from gift items table)         */
-        /*  Rule: assign total MUST NOT exceed return total (budget)     */
-        /* ============================================================ */
+
 
         _recalculateAssignTotal: function () {
             var oTable         = this.byId("giftItemsTable");
@@ -459,15 +420,12 @@ sap.ui.define([
             return fAssignTotal;
         },
 
-        /* ============================================================ */
-        /*  SUBMIT                                                        */
-        /* ============================================================ */
+   
 
         onSubmit: function () {
             var sMobile  = this.byId("mobileInput").getValue();
             var sComment = this.byId("inputComments").getValue();
 
-            // ── Basic validations ──────────────────────────────────
             if (!sMobile) {
                 MessageToast.show("Please enter or select a customer mobile.");
                 return;
@@ -477,7 +435,7 @@ sap.ui.define([
                 return;
             }
 
-            // ── Collect return vouchers from tree table ────────────
+          
             var oTreeModel      = this.getView().getModel("treeModel");
             var aNodes          = oTreeModel ? (oTreeModel.getProperty("/nodes") || []) : [];
             var aReturnVouchers = [];
@@ -507,7 +465,6 @@ sap.ui.define([
                 return;
             }
 
-            // ── Collect assign vouchers from gift items table ──────
             var oTable         = this.byId("giftItemsTable");
             var oGiftModel     = this.getView().getModel("giftModel");
             var aSelectedIdx   = oTable.getSelectedIndices();

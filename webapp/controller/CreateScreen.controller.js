@@ -11,9 +11,8 @@ sap.ui.define([
 
     return Controller.extend("gvtracker.controller.CreateScreen", {
 
-        /* ============================================================ */
-        /*  LIFECYCLE                                                     */
-        /* ============================================================ */
+       
+
 
         onInit: function () {
             var oRoute = this.getOwnerComponent().getRouter();
@@ -21,41 +20,35 @@ sap.ui.define([
         },
 
         _onRouteMatched: function () {
-            // ── Reset all state on every navigation ──────────────────
+          
             this._sCustomerId = null;
-            this._oCustomerDialogPromise = null;
+        
 
-            // Reset header fields
-            this.byId("mobileInput").setValue("");
+            this.byId("mobileCustomerInput").setValue("");
             this.byId("camPaignVlaueHelp").setValue("");
             this.byId("inputEmployee").setValue("102312");
             this.byId("totalAssignValue").setText("0.00");
             this.byId("inputComments").setValue("");
 
-            // Reset button states
+        
             this.byId("custBillInfo").setEnabled(false);
-            this.byId("addCustInfo").setEnabled(true);  // BUG FIX: re-enable on every open
+            this.byId("addCustInfo").setEnabled(true); 
 
-            // Set today's date
             var oToday  = new Date();
             var sDate   = String(oToday.getDate()).padStart(2, "0") + "/" +
                           String(oToday.getMonth() + 1).padStart(2, "0") + "/" +
                           oToday.getFullYear();
             this.byId("GVRDate").setText(sDate);
 
-            // Clear bill payload in app model
             var oAppModel = this.getOwnerComponent().getModel("appModel");
             if (oAppModel) {
                 oAppModel.setProperty("/billsPayload", []);
             }
 
-            // Deselect all checkboxes and reset total
+       
             this._resetTableSelections();
         },
 
-        /* ============================================================ */
-        /*  RESET TABLE CHECKBOXES                                       */
-        /* ============================================================ */
 
         _resetTableSelections: function () {
             var oTable = this.byId("giftTable");
@@ -69,16 +62,13 @@ sap.ui.define([
             this.byId("totalAssignValue").setText("0.00");
         },
 
-        /* ============================================================ */
-        /*  NAVIGATION                                                   */
-        /* ============================================================ */
 
         onAddCustomer: function () {
             this.getOwnerComponent().getRouter().navTo("RouteAddCustomer");
         },
 
         onAddCustomerBillInfo: function () {
-            var sMobile = this.byId("mobileInput").getValue();
+            var sMobile = this.byId("mobileCustomerInput").getValue();
             this.getOwnerComponent().getRouter().navTo("RouteAddBillInfo", {
                 mobile: sMobile
             });
@@ -88,31 +78,26 @@ sap.ui.define([
             this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");
         },
 
-        /* ============================================================ */
-        /*  CUSTOMER VALUE HELP                                          */
-        /* ============================================================ */
+  onMobileValueHelp: function () {
+    var oView = this.getView();
 
-        onMobileValueHelp: function () {
-            var oView = this.getView();
+    if (this.oCustomerDialog) {          // already loaded — just open
+        this.oCustomerDialog.open();
+        return;
+    }
 
-            if (!this._oCustomerDialogPromise) {
-                this._oCustomerDialogPromise = Fragment.load({
-                    id:         oView.getId(),
-                    name:       "gvtracker.fragments.CustomerValueHelp",
-                    controller: this
-                }).then(function (oDialog) {
-                    oView.addDependent(oDialog);
-                    this.oCustomerDialog = oDialog;
-                    return oDialog;
-                }.bind(this));
-            }
+    Fragment.load({
+        id:         oView.getId(),
+        name:       "gvtracker.fragments.CustomerValueHelp",
+        controller: this
+    }).then(function (oDialog) {
+        oView.addDependent(oDialog);
+        this.oCustomerDialog = oDialog;
+        oDialog.open();
+    }.bind(this));
+},
 
-            this._oCustomerDialogPromise.then(function (oDialog) {
-                oDialog.open();
-            });
-        },
 
-        // BUG FIX: was missing — fragment Cancel button calls this
         onCustomerDialogClose: function () {
             if (this.oCustomerDialog) {
                 this.oCustomerDialog.close();
@@ -139,21 +124,18 @@ sap.ui.define([
             var oContext      = oEvent.getSource().getBindingContext();
             this._sCustomerId = oContext.getProperty("ID");
             var sPhone        = oContext.getProperty("phone");
-            this.byId("mobileInput").setValue(sPhone);
+            this.byId("mobileCustomerInput").setValue(sPhone);
             this._setEnabledState();
             if (this.oCustomerDialog) { this.oCustomerDialog.close(); }
         },
 
-        /* ============================================================ */
-        /*  MOBILE LIVE CHANGE (manual typing)                           */
-        /* ============================================================ */
 
         onMobileChange: function (oEvent) {
             var sMobile = oEvent.getSource().getValue();
 
             if (sMobile.length !== 10) {
                 this.byId("custBillInfo").setEnabled(false);
-                // BUG FIX: re-enable Add Customer Profile when mobile is cleared
+           
                 this.byId("addCustInfo").setEnabled(true);
                 this._sCustomerId = null;
                 return;
@@ -186,29 +168,25 @@ sap.ui.define([
             this.byId("addCustInfo").setEnabled(false);
         },
 
-        /* ============================================================ */
-        /*  CAMPAIGN VALUE HELP                                          */
-        /* ============================================================ */
+     
+onCampaignValueHelp: function () {
+    var oView = this.getView();
 
-        onCampaignValueHelp: function () {
-            var oView = this.getView();
+    if (this.campaignValueHelpDialog) {  
+        this.campaignValueHelpDialog.open();
+        return;
+    }
 
-            if (!this._oCampaignDialogPromise) {
-                this._oCampaignDialogPromise = Fragment.load({
-                    id:         oView.getId(),
-                    name:       "gvtracker.fragments.CampaignValueHelp",
-                    controller: this
-                }).then(function (oDialog) {
-                    oView.addDependent(oDialog);
-                    this.campaignValueHelpDialog = oDialog;
-                    return oDialog;
-                }.bind(this));
-            }
-
-            this._oCampaignDialogPromise.then(function (oDialog) {
-                oDialog.open();
-            });
-        },
+    Fragment.load({
+        id:         oView.getId(),
+        name:       "gvtracker.fragments.CampaignValueHelp",
+        controller: this
+    }).then(function (oDialog) {
+        oView.addDependent(oDialog);
+        this.campaignValueHelpDialog = oDialog;
+        oDialog.open();
+    }.bind(this));
+},
 
         onSelectionChange: function (oEvent) {
             var oItem = oEvent.getParameter("listItem");
@@ -224,12 +202,7 @@ sap.ui.define([
             }
         },
 
-        /* ============================================================ */
-        /*  GIFT TABLE — QTY + CHECKBOX                                  */
-        /* ============================================================ */
-
-        // BUG FIX: use "change" not "liveChange" — liveChange fires on every
-        // keystroke so typing "12" would first fire for "1" and clamp it
+     
         onIssueItemChange: function (oEvent) {
             var oInput      = oEvent.getSource();
             var iEnteredQty = parseInt(oInput.getValue(), 10) || 0;
@@ -260,7 +233,7 @@ sap.ui.define([
 
             aItems.forEach(function (oItem) {
                 var oCheckBox = oItem.getCells()[0]; // index 0 = CheckBox
-                var oQtyInput = oItem.getCells()[5]; // index 5 = Issue Qty Input
+                var oQtyInput = oItem.getCells()[5]; // index 5 
                 var oContext  = oItem.getBindingContext();
 
                 if (oCheckBox && oCheckBox.getSelected()) {
@@ -273,16 +246,13 @@ sap.ui.define([
             this.byId("totalAssignValue").setText(fTotal.toFixed(2));
         },
 
-        /* ============================================================ */
-        /*  SUBMIT                                                        */
-        /* ============================================================ */
 
         onSubmit: function () {
-            var sMobile   = this.byId("mobileInput").getValue().trim();
+            var sMobile   = this.byId("mobileCustomerInput").getValue().trim();
             var sCampaign = this.byId("camPaignVlaueHelp").getValue().trim();
-            var sComment  = this.byId("inputComments").getValue();
+            var sComment  = this.byId("inputComments").getValue()
 
-            // ── Validations ──────────────────────────────────────────
+            
             if (!sMobile) {
                 MessageToast.show("Please enter customer mobile.");
                 return;
@@ -304,7 +274,7 @@ sap.ui.define([
                 return;
             }
 
-            // ── Collect selected vouchers ────────────────────────────
+          
             var oTable         = this.byId("giftTable");
             var aItems         = oTable.getItems();
             var aAssignVouchers = [];
@@ -334,25 +304,25 @@ sap.ui.define([
                 return;
             }
 
-            // ── Build payload ────────────────────────────────────────
+        
             var oPayload = {
                 gvr_type_code:           "CI",
                 cust_type_code:          "MALL",
                 shoppingMall_plant_code: 8208,
                 customer_ID:             this._sCustomerId,
                 employee_code:           102312,
-                assignGiftsTotal_amt:    fAssignTotal,
-                returnGiftsTotal_amt:    0,
+                 assignGiftsTotal_amt:    fAssignTotal,
+                // returnGiftsTotal_amt:    0,
                 comment:                 sComment,
                 campaign_name:           sCampaign,
                 bills:                   aBillsPayload,
                 assignGiftVouchers:      aAssignVouchers,
-                returnGiftVouchers:      []
+               // returnGiftVouchers:      []
             };
 
             console.log("Payload:", JSON.stringify(oPayload, null, 2));
 
-            // ── POST ─────────────────────────────────────────────────
+      
             var oDataModel = this.getView().getModel();
             oDataModel.create("/GVHeaderSet", oPayload, {
                 success: function (oData) {
@@ -364,7 +334,7 @@ sap.ui.define([
                     );
                     this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");
                 }.bind(this),
-                // BUG FIX: was missing .bind(this) — 'this' was undefined in error cb
+              
                 error: function (oErr) {
                     console.error("FAILED:", oErr);
                     var sMsg = "Submit failed. Please try again.";
@@ -373,7 +343,7 @@ sap.ui.define([
                         if (oErrBody && oErrBody.error && oErrBody.error.message) {
                             sMsg = oErrBody.error.message.value || sMsg;
                         }
-                    } catch (e) { /* ignore parse error */ }
+                    } catch (e) {  }
                     MessageBox.error(sMsg);
                 }.bind(this)
             });
