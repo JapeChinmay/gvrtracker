@@ -421,148 +421,150 @@ sap.ui.define([
         },
 
    
+  onSubmit: function () {
+    var sMobile  = this.byId("mobileInput").getValue();
+    var sComment = this.byId("inputComments").getValue();
 
-        onSubmit: function () {
-            var sMobile  = this.byId("mobileInput").getValue();
-            var sComment = this.byId("inputComments").getValue();
+    if (!sMobile) {
+        MessageToast.show("Please enter or select a customer mobile.");
+        return;
+    }
+    if (!this._sCustomerId) {
+        MessageToast.show("Customer not found. Please select a valid customer.");
+        return;
+    }
 
-            if (!sMobile) {
-                MessageToast.show("Please enter or select a customer mobile.");
-                return;
-            }
-            if (!this._sCustomerId) {
-                MessageToast.show("Customer not found. Please select a valid customer.");
-                return;
-            }
+    // ── 1. Build return vouchers ──────────────────────────────────────
+    var oTreeModel      = this.getView().getModel("treeModel");
+    var aNodes          = oTreeModel ? (oTreeModel.getProperty("/nodes") || []) : [];
+    var aReturnVouchers = [];
+    var fReturnTotal    = 0;
 
-          
-            var oTreeModel      = this.getView().getModel("treeModel");
-            var aNodes          = oTreeModel ? (oTreeModel.getProperty("/nodes") || []) : [];
-            var aReturnVouchers = [];
-            var fReturnTotal    = 0;
-
-            aNodes.forEach(function (oParent) {
-                var sHeaderId = oParent.headerId;
-                (oParent.nodes || []).forEach(function (oChild) {
-                    var iQty = parseInt(oChild.return_quantity, 10) || 0;
-                    if (iQty > 0) {
-                        var fPrice  = parseFloat(oChild.price) || 0;
-                        var fAmount = iQty * fPrice;
-                        fReturnTotal += fAmount;
-                        aReturnVouchers.push({
-                            giftVoucher_ID:        oChild.giftVoucherId,
-                            total_amount:          fAmount,
-                            issue_quantity:        iQty,
-                            returnedGVHeader_ID:   sHeaderId,
-                            RT_Ass_GiftVoucher_ID: oChild.assignId
-                        });
-                    }
+    aNodes.forEach(function (oParent) {
+        var sHeaderId = oParent.headerId;
+        (oParent.nodes || []).forEach(function (oChild) {
+            var iQty = parseInt(oChild.return_quantity, 10) || 0;
+            if (iQty > 0) {
+                var fPrice  = parseFloat(oChild.price) || 0;
+                var fAmount = iQty * fPrice;
+                fReturnTotal += fAmount;
+                aReturnVouchers.push({
+                    giftVoucher_ID:        oChild.giftVoucherId,
+                    total_amount:          fAmount,
+                    issue_quantity:        iQty,
+                    returnedGVHeader_ID:   sHeaderId,
+                    RT_Ass_GiftVoucher_ID: oChild.assignId
                 });
-            });
-
-            if (aReturnVouchers.length === 0) {
-                MessageToast.show("Please enter a return quantity for at least one item in 'Gifts Assigned to Customer'.");
-                return;
             }
+        });
+    });
 
-            var oTable         = this.byId("giftItemsTable");
-            var oGiftModel     = this.getView().getModel("giftModel");
-            var aSelectedIdx   = oTable.getSelectedIndices();
-            var aItems         = oGiftModel ? (oGiftModel.getProperty("/items") || []) : [];
-            var aAssignVouchers = [];
-            var fAssignTotal    = 0;
+    if (aReturnVouchers.length === 0) {
+        MessageToast.show("Please enter a return quantity for at least one item in 'Gifts Assigned to Customer'.");
+        return;
+    }
 
-            aSelectedIdx.forEach(function (iIdx) {
-                var oItem = aItems[iIdx];
-                if (oItem) {
-                    var iQty   = parseInt(oItem.issue_quantity, 10) || 0;
-                    var fPrice = parseFloat(oItem.price) || 0;
-                    var fAmt   = iQty * fPrice;
-                    fAssignTotal += fAmt;
-                    aAssignVouchers.push({
-                        giftVoucher_ID: oItem.ID,
-                        total_amount:   fAmt,
-                        issue_quantity: iQty
-                    });
+    // ── 2. Build assign (replacement) vouchers ────────────────────────
+    var oTable       = this.byId("giftItemsTable");
+    var oGiftModel   = this.getView().getModel("giftModel");
+    var aSelectedIdx = oTable.getSelectedIndices();
+    var aItems       = oGiftModel ? (oGiftModel.getProperty("/items") || []) : [];
+
+    if (aSelectedIdx.length === 0) {
+        MessageToast.show("Please select at least one replacement gift item.");
+        return;
+    }
+
+    var aAssignVouchers = [];
+    var fAssignTotal    = 0;
+
+    // ── 3. Per-item qty + stock validation, accumulate total ──────────
+    for (var i = 0; i < aSelectedIdx.length; i++) {
+        var oRowContext = oTable.getContextByIndex(aSelectedIdx[i]);
+        if (!oRowContext) { continue; }
+
+        var oItem  = oRowContext.getObject();
+        var iQty   = parseInt(oItem.issue_quantity, 10) || 0;
+        var iStock = parseInt(oItem.stock, 10) || 0;
+
+        if (iQty < 1) {
+            MessageToast.show(
+                "Issue quantity for '" + (oItem.descr || oItem.material) +
+                "' must be at least 1."
+            );
+            return;
+        }
+        if (iQty > iStock) {
+            MessageToast.show(
+                "'" + (oItem.descr || oItem.material) +
+                "' only has " + iStock + " in stock. Please reduce the quantity."
+            );
+            return;
+        }
+
+        var fPrice = parseFloat(oItem.price) || 0;
+        var fAmt   = iQty * fPrice;
+        fAssignTotal += fAmt;
+
+        aAssignVouchers.push({
+            giftVoucher_ID: oItem.ID,
+            total_amount:   fAmt,
+            issue_quantity: iQty
+        });
+    }
+
+    // ── 4. Return value must be >= replacement value (backend rule) ───
+    // e.g. return ₹7000 iPhone → can replace with up to ₹7000 worth
+    // e.g. return ₹1000 voucher → cannot replace with ₹7000 iPhone
+    if (fReturnTotal < fAssignTotal) {
+        MessageBox.warning(
+            "Replacement total (\u20B9" + fAssignTotal.toFixed(2) +
+            ") cannot exceed the return total (\u20B9" + fReturnTotal.toFixed(2) +
+            ").\n\nPlease select replacement items within the returned value."
+        );
+        return;
+    }
+
+    // ── 5. Build payload ──────────────────────────────────────────────
+    var oPayload = {
+        gvr_type_code:           "RP",
+        shoppingMall_plant_code: 8208,
+        customer_ID:             this._sCustomerId,
+        employee_code:           102312,
+        assignGiftsTotal_amt:    fAssignTotal,
+        returnGiftsTotal_amt:    fReturnTotal,
+        comment:                 sComment,
+        assignGiftVouchers:      aAssignVouchers,
+        returnGiftVouchers:      aReturnVouchers
+    };
+
+    console.log("Replacement payload:", JSON.stringify(oPayload, null, 2));
+
+
+    var oDataModel = this.getView().getModel();
+    oDataModel.create("/GVHeaderSet", oPayload, {
+        success: function (oData) {
+            console.log("Replacement submitted:", oData);
+            var sNewGVR = oData.gv_no || "";
+            MessageToast.show(
+                "Replacement submitted successfully!" +
+                (sNewGVR ? " New GVR: " + sNewGVR : "")
+            );
+            this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");
+        }.bind(this),
+        error: function (oErr) {
+            console.error("Replacement submit failed:", oErr);
+            var sMsg = "Submit failed. Please try again.";
+            try {
+                var oErrBody = JSON.parse(oErr.responseText);
+                if (oErrBody && oErrBody.error && oErrBody.error.message) {
+                    sMsg = oErrBody.error.message.value || sMsg;
                 }
-            });
-
-            if (aAssignVouchers.length === 0) {
-                MessageToast.show("Please select at least one replacement gift item.");
-                return;
-            }
-
-        
-            if (fAssignTotal > fReturnTotal) {
-                MessageBox.warning(
-                    "Replacement value (" + fAssignTotal.toFixed(2) +
-                    ") cannot exceed the return value (" + fReturnTotal.toFixed(2) +
-                    "). Please adjust your selection."
-                );
-                return;
-            }
-
-          
-            for (var i = 0; i < aSelectedIdx.length; i++) {
-                var oItem  = aItems[aSelectedIdx[i]];
-                var iQty   = parseInt(oItem.issue_quantity, 10) || 0;
-                var iStock = parseInt(oItem.stock, 10) || 0;
-                if (iQty > iStock) {
-                    MessageToast.show(
-                        "Issue quantity for '" + oItem.descr +
-                        "' exceeds available stock (" + iStock + ")."
-                    );
-                    return;
-                }
-                if (iQty < 1) {
-                    MessageToast.show(
-                        "Issue quantity for '" + oItem.descr + "' must be at least 1."
-                    );
-                    return;
-                }
-            }
-
-    
-            var oPayload = {
-                gvr_type_code:           "RP",
-                shoppingMall_plant_code: 8208,
-                customer_ID:             this._sCustomerId,
-                employee_code:           102312,
-                assignGiftsTotal_amt:    fAssignTotal,
-                returnGiftsTotal_amt:    fReturnTotal,
-                comment:                 sComment,
-                assignGiftVouchers:      aAssignVouchers,
-                returnGiftVouchers:      aReturnVouchers
-            };
-
-            console.log("Replacement payload:", JSON.stringify(oPayload, null, 2));
-
-            //POST
-            var oDataModel = this.getView().getModel();
-            oDataModel.create("/GVHeaderSet", oPayload, {
-                success: function (oData) {
-                    console.log("Replacement submitted:", oData);
-                    var sNewGVR = oData.gv_no || "";
-                    var sMsg    = "Replacement submitted successfully!" +
-                                  (sNewGVR ? " New GVR: " + sNewGVR : "");
-                    MessageToast.show(sMsg);
-                    this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");
-                }.bind(this),
-                error: function (oErr) {
-                    console.error("Replacement submit failed:", oErr);
-                    var sMsg = "Submit failed. Please try again.";
-                    try {
-                        var oErrBody = JSON.parse(oErr.responseText);
-                        if (oErrBody && oErrBody.error && oErrBody.error.message) {
-                            sMsg = oErrBody.error.message.value || sMsg;
-                        }
-                    } catch (e) { /* ignore */ }
-                    MessageBox.error(sMsg);
-                }.bind(this)
-            });
-        },
-
-
+            } catch (e) { /* ignore */ }
+            MessageBox.error(sMsg);
+        }.bind(this)
+    });
+},
         onCancel: function () {
             this.getOwnerComponent().getRouter().navTo("RouteHomeScreen");
         },
