@@ -159,12 +159,12 @@ sap.ui.define([
                         return;
                     }
 
-                    // Set header info from first record
+                
                     var oFirst = aResults[0];
                     this.byId("txtMall").setText(String(oFirst.shoppingMall_plant_code || ""));
                     this.byId("inputEmployee").setValue(String(oFirst.employee_code || ""));
 
-                    // Build tree
+                 
                     var aTreeNodes = this._buildTreeNodes(aResults);
                     var oTreeModel = new JSONModel({ nodes: aTreeNodes });
                     this.getView().setModel(oTreeModel, "treeModel");
@@ -176,7 +176,7 @@ sap.ui.define([
                     });
                     oTreeTable.expandToLevel(1);
 
-                    // Recalculate totals (return qty starts at 0)
+                 
                     this._recalculateReturnTotal();
                 }.bind(this),
                 error: function (oErr) {
@@ -197,7 +197,7 @@ sap.ui.define([
                 success: function (oData) {
                     var aResults = oData.results || [];
                     var aItems   = aResults.map(function (oGV) {
-                        // GF type = editable issue qty, GV type = read-only (dashed style)
+                   
                         var bEditable = (oGV.type_code === "GF");
                         return {
                             ID:            oGV.ID,
@@ -301,7 +301,7 @@ sap.ui.define([
             var oTable = this.byId("assignedGiftsTree");
             oTable.getSelectedIndices().forEach(function (i) { oTable.expand(i); });
         },
-        onRowSelectionChange: function () { /* reserved */ },
+        onRowSelectionChange: function () {  },
 
 
         onReturnQtyChange: function (oEvent) {
@@ -434,7 +434,6 @@ sap.ui.define([
         return;
     }
 
-    // ── 1. Build return vouchers ──────────────────────────────────────
     var oTreeModel      = this.getView().getModel("treeModel");
     var aNodes          = oTreeModel ? (oTreeModel.getProperty("/nodes") || []) : [];
     var aReturnVouchers = [];
@@ -464,7 +463,7 @@ sap.ui.define([
         return;
     }
 
-    // ── 2. Build assign (replacement) vouchers ────────────────────────
+  
     var oTable       = this.byId("giftItemsTable");
     var oGiftModel   = this.getView().getModel("giftModel");
     var aSelectedIdx = oTable.getSelectedIndices();
@@ -478,7 +477,7 @@ sap.ui.define([
     var aAssignVouchers = [];
     var fAssignTotal    = 0;
 
-    // ── 3. Per-item qty + stock validation, accumulate total ──────────
+
     for (var i = 0; i < aSelectedIdx.length; i++) {
         var oRowContext = oTable.getContextByIndex(aSelectedIdx[i]);
         if (!oRowContext) { continue; }
@@ -513,19 +512,16 @@ sap.ui.define([
         });
     }
 
-    // ── 4. Return value must be >= replacement value (backend rule) ───
-    // e.g. return ₹7000 iPhone → can replace with up to ₹7000 worth
-    // e.g. return ₹1000 voucher → cannot replace with ₹7000 iPhone
-    if (fReturnTotal < fAssignTotal) {
-        MessageBox.warning(
-            "Replacement total (\u20B9" + fAssignTotal.toFixed(2) +
-            ") cannot exceed the return total (\u20B9" + fReturnTotal.toFixed(2) +
-            ").\n\nPlease select replacement items within the returned value."
-        );
-        return;
-    }
+    if (fAssignTotal < fReturnTotal) {
+    MessageBox.warning(
+        "Replacement total (\u20B9" + fAssignTotal.toFixed(2) +
+        ") must be equal to or more than the return total (\u20B9" + fReturnTotal.toFixed(2) +
+        ").\n\nPlease select replacement items of equal or higher value."
+    );
+    return;
+}
 
-    // ── 5. Build payload ──────────────────────────────────────────────
+    
     var oPayload = {
         gvr_type_code:           "RP",
         shoppingMall_plant_code: 8208,
@@ -560,7 +556,7 @@ sap.ui.define([
                 if (oErrBody && oErrBody.error && oErrBody.error.message) {
                     sMsg = oErrBody.error.message.value || sMsg;
                 }
-            } catch (e) { /* ignore */ }
+            } catch (e) {  }
             MessageBox.error(sMsg);
         }.bind(this)
     });
