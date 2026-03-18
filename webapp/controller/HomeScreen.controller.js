@@ -9,18 +9,13 @@ sap.ui.define([
 
     return Controller.extend("gvtracker.controller.HomeScreen", {
 
-        /* ============================================================ */
-        /*  LIFECYCLE                                                     */
-        /* ============================================================ */
+  
 
         onInit: function () {
             // GVR input disabled by default (CREATE mode selected)
             this.byId("GVRInput").setEnabled(false);
         },
 
-        /* ============================================================ */
-        /*  MODE RADIO BUTTON                                            */
-        /* ============================================================ */
 
         onModeSelect: function (oEvent) {
             var iIndex    = oEvent.getSource().getSelectedIndex();
@@ -49,9 +44,6 @@ sap.ui.define([
             }
         },
 
-        /* ============================================================ */
-        /*  EXECUTE BUTTON                                               */
-        /* ============================================================ */
 
         OnExecute: function () {
             var iMode = this.byId("modeSelect").getSelectedIndex();
@@ -176,9 +168,7 @@ sap.ui.define([
             oBtn.setText(bVisible ? "Show Filters" : "Hide Filters");
         },
 
-        /* ============================================================ */
-        /*  GVR FRAGMENT ITEM SELECT                                     */
-        /* ============================================================ */
+    
 
         onGVRSelect: function (oEvent) {
             var oItem    = oEvent.getParameter("listItem");

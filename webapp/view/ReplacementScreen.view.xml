@@ -15,9 +15,6 @@
         <content>
             <VBox class="sapUiSmallMargin">
 
-                <!-- ═══════════════════════════════════════════════════ -->
-                <!-- HEADER FORM                                          -->
-                <!-- ═══════════════════════════════════════════════════ -->
                 <f:SimpleForm
                     layout="ResponsiveGridLayout"
                     columnsXL="4"
@@ -31,7 +28,7 @@
                         <Label text="Customer Mobile :*" design="Bold"/>
                         <HBox alignItems="Center">
                             <Input
-                                id="mobileInput"
+                                id="mobileInputReplacement"
                                 placeholder="Enter Mobile"
                                 value=""
                                 showValueHelp="true"
@@ -48,9 +45,7 @@
                     </f:content>
                 </f:SimpleForm>
 
-                <!-- ═══════════════════════════════════════════════════ -->
-                <!-- TOTALS                                               -->
-                <!-- ═══════════════════════════════════════════════════ -->
+       
                 <f:SimpleForm
                     layout="ResponsiveGridLayout"
                     columnsXL="2"
@@ -66,17 +61,12 @@
                     </f:content>
                 </f:SimpleForm>
 
-                <!-- ═══════════════════════════════════════════════════ -->
-                <!-- COMMENTS                                             -->
-                <!-- ═══════════════════════════════════════════════════ -->
+         
                 <VBox class="sapUiSmallMarginTop sapUiSmallMarginBottom">
                     <Label text="Comments :"/>
                     <Input id="inputComments" width="100%" placeholder="Enter comments"/>
                 </VBox>
 
-                <!-- ═══════════════════════════════════════════════════ -->
-                <!-- TABLE 1 : GIFTS ASSIGNED TO CUSTOMER (TreeTable)    -->
-                <!-- ═══════════════════════════════════════════════════ -->
                 <Toolbar design="Transparent" class="sapUiSmallMarginTop">
                     <Title text="Gifts Assigned to Customer" level="H4"/>
                     <ToolbarSpacer/>

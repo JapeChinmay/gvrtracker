@@ -24,7 +24,7 @@ sap.ui.define([
             this._fMaxAllowedAssign = 0; // Total return value = max assign budget
 
             // Reset header fields
-            this.byId("mobileInput").setValue("");
+            this.byId("mobileInputReplacement").setValue("");
             this.byId("inputEmployee").setValue("");
             this.byId("txtMall").setText("");
             this.byId("txtTotalReturnValue").setText("0");
@@ -88,7 +88,7 @@ sap.ui.define([
             var oContext      = oEvent.getSource().getBindingContext();
             this._sCustomerId = oContext.getProperty("ID");
             var sPhone        = oContext.getProperty("phone");
-            this.byId("mobileInput").setValue(sPhone);
+            this.byId("mobileInputReplacement").setValue(sPhone);
             if (this.oCustomerDialog) { this.oCustomerDialog.close(); }
             this._loadAllData();
         },
@@ -422,7 +422,7 @@ sap.ui.define([
 
    
   onSubmit: function () {
-    var sMobile  = this.byId("mobileInput").getValue();
+    var sMobile  = this.byId("mobileInputReplacement").getValue();
     var sComment = this.byId("inputComments").getValue();
 
     if (!sMobile) {
@@ -512,11 +512,11 @@ sap.ui.define([
         });
     }
 
-    if (fAssignTotal < fReturnTotal) {
+if (fReturnTotal < fAssignTotal) {
     MessageBox.warning(
         "Replacement total (\u20B9" + fAssignTotal.toFixed(2) +
-        ") must be equal to or more than the return total (\u20B9" + fReturnTotal.toFixed(2) +
-        ").\n\nPlease select replacement items of equal or higher value."
+        ") cannot exceed the return total (\u20B9" + fReturnTotal.toFixed(2) +
+        ").\n\nPlease select replacement items within the returned value."
     );
     return;
 }
