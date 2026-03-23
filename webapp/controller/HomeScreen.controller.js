@@ -12,7 +12,7 @@ sap.ui.define([
   
 
         onInit: function () {
-            // GVR input disabled by default (CREATE mode selected)
+    
             this.byId("GVRInput").setEnabled(false);
         },
 
@@ -27,7 +27,7 @@ sap.ui.define([
                 oGVRInput.setValue("");
                 oGVRInput.setPlaceholder("Not required for CREATE");
             } else if (iIndex === 1) {
-                // RETURN — GVR not needed (customer selected on screen)
+               
                 oGVRInput.setEnabled(false);
                 oGVRInput.setValue("");
                 oGVRInput.setPlaceholder("Not required for RETURN");
@@ -37,7 +37,7 @@ sap.ui.define([
                 oGVRInput.setValue("");
                 oGVRInput.setPlaceholder("Not required for REPLACEMENT");
             } else if (iIndex === 3) {
-                // DISPLAY — GVR required
+               
                 oGVRInput.setEnabled(true);
                 oGVRInput.setValue("");
                 oGVRInput.setPlaceholder("Enter GVR Number");
@@ -51,19 +51,19 @@ sap.ui.define([
             var oRouter = this.getOwnerComponent().getRouter();
 
             if (iMode === 0) {
-                // CREATE
+              
                 oRouter.navTo("RouteCreateScreen");
 
             } else if (iMode === 1) {
-                // RETURN
+             
                 oRouter.navTo("RouteReturnScreen");
 
             } else if (iMode === 2) {
-                // REPLACEMENT
+             
                 oRouter.navTo("RouteReplacementScreen");
 
             } else if (iMode === 3) {
-                // DISPLAY — GVR number required
+             
                 if (!sGVR) {
                     MessageToast.show("Please enter a GVR Number for Display.");
                     return;
@@ -72,9 +72,6 @@ sap.ui.define([
             }
         },
 
-        /* ============================================================ */
-        /*  GVR VALUE HELP                                               */
-        /* ============================================================ */
 
         onGVRValueHelp: function () {
             var oView = this.getView();
@@ -116,13 +113,10 @@ sap.ui.define([
             });
         },
 
-        /* ============================================================ */
-        /*  GVR FRAGMENT SEARCH                                          */
-        /* ============================================================ */
 
         onGVRSearch: function () {
             var sViewId  = this.getView().getId();
-            // BUG FIX: field is "gv_no" not "gvr_no"
+            //  "gv_no" not "gvr_no"
             var sGVRNo   = Fragment.byId(sViewId, "filterGVRNo").getValue();
             var sPhone   = Fragment.byId(sViewId, "filterPhone").getValue();
             var sGVRType = Fragment.byId(sViewId, "filterGVRType").getValue();
@@ -154,9 +148,7 @@ sap.ui.define([
             oBinding.filter(aFilters);
         },
 
-        /* ============================================================ */
-        /*  GVR FRAGMENT TOGGLE FILTERS                                  */
-        /* ============================================================ */
+      
 
         onToggleFilters: function () {
             var sViewId    = this.getView().getId();

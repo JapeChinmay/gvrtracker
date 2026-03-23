@@ -67,7 +67,7 @@
                                     <RadioButtonGroup
                                         id="modeSelect"
                                         selectedIndex="0"
-                                        columns="4"
+                                        columns="1"
                                         select="onModeSelect">
                                         <buttons>
                                             <RadioButton text="CREATE"/>
@@ -112,7 +112,8 @@
                                     type="Emphasized"
                                     icon="sap-icon://play"
                                     press="OnExecute"
-                                    width="150px"/>
+                                      class="gvt-btn gvt-btn--primary"
+                                    width="100px"/>
                             </HBox>
 
                         </VBox>

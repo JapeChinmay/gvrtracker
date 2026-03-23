@@ -22,7 +22,7 @@ sap.ui.define([
             this._sCustomerId = null;
             this._oCustomerDialogPromise = null;
 
-            this.byId("mobileInput").setValue("");
+            this.byId("mobileInputReturn").setValue("");
             this.byId("inputEmployee").setValue("");
             this.byId("txtMall").setText("");
             this.byId("txtTotalReturnValue").setText("0");
@@ -95,14 +95,14 @@ sap.ui.define([
             var sPhone = oContext.getProperty("phone");
             var sName = oContext.getProperty("name");
 
-            this.byId("mobileInput").setValue(sPhone);
+            this.byId("mobileInputReturn").setValue(sPhone);
             this.byId("inputEmployee").setValue(""); 
 
             if (this.oCustomerDialog) {
                 this.oCustomerDialog.close();
             }
 
-            // Fetch assigned vouchers for  customer
+          
             this.callCustomerVoucher();
         },
 
@@ -173,7 +173,7 @@ sap.ui.define([
                         String(oFirst.employee_code || "")
                     );
        
-                       // build tree nodes so that the nested data can be set   .  
+                   
                 
                     var aTreeNodes = this._buildTreeNodes(aResults);
 
@@ -360,7 +360,7 @@ _formatODataDateLong: function (oDateVal) {
 
 
 onSubmit: function () {
-    var sMobile  = this.byId("mobileInput").getValue();
+    var sMobile  = this.byId("mobileInputReturn").getValue();
     var sComment = this.byId("inputComments").getValue();
 
     if (!sMobile) {

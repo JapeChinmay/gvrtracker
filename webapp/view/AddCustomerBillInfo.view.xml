@@ -43,7 +43,7 @@
                         press="onDeleteBillRow"
                     />
 
-                     <Button text="Submit" tooltip="Submit" press="onNext" />
+                     <Button text="Submit" tooltip="Submit" class="gvt-btn gvt-btn--primary"  press="onNext" />
                 </Toolbar>
 
                 <Table

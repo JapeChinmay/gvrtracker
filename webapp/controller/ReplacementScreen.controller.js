@@ -21,7 +21,7 @@ sap.ui.define([
         _onRouteMatched: function () {
             this._sCustomerId       = null;
             this._oCustomerDialogPromise = null;
-            this._fMaxAllowedAssign = 0; // Total return value = max assign budget
+            this._fMaxAllowedAssign = 0
 
             // Reset header fields
             this.byId("mobileInputReplacement").setValue("");
@@ -512,7 +512,7 @@ sap.ui.define([
         });
     }
 
-if (fReturnTotal < fAssignTotal) {
+if (fReturnTotal > fAssignTotal) {
     MessageBox.warning(
         "Replacement total (\u20B9" + fAssignTotal.toFixed(2) +
         ") cannot exceed the return total (\u20B9" + fReturnTotal.toFixed(2) +

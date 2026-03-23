@@ -108,6 +108,7 @@
                 <Button
                     text="Back"
                     press="onBack"
+                     class="gvt-btn gvt-btn--ghost"
                 />
             </Toolbar>
         </footer>

@@ -5,105 +5,128 @@
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core">
 
-    <Page title="Gift Voucher Tracker - Mall Customer Profile">
+    <Page
+        title="Gift Voucher Tracker - Mall Customer Profile"
+        showNavButton="false">
+
+        <headerContent>
+            <Button
+                text="Home"
+                icon="sap-icon://home"
+                type="Transparent"
+                press="onCancel"
+                class="gvt-btn gvt-btn--ghost"/>
+        </headerContent>
 
         <content>
 
-            <VBox width="70%" class="sapUiMediumMargin">
+       
+            <VBox alignItems="Center" class="sapUiMediumMarginTop">
 
-                <f:SimpleForm
-                    layout="ResponsiveGridLayout"
-                    labelSpanXL="3"
-                    labelSpanL="3"
-                    labelSpanM="3"
-                    columnsXL="1"
-                    columnsL="1"
-                    columnsM="1"
-                    editable="true">
+           
+                <VBox
+                    width="560px"
+                    style="
+                        background: #ffffff;
+                        border: 1px solid #e8eaed;
+                        border-radius: 16px;
+                        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+                        overflow: hidden;">
 
+                  
                
 
-                    <Label text="Cust. Mobile Number" required="true"/>
+                 
+                    <VBox style="padding: 24px 28px 20px;">
 
-                    <Input
-                        value="{customer>/phone}"
-                        width="50%"
-                        maxLength="10"
-                        type="Number"/>
+                  
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label
+                                text="Mobile Number"
+                                required="true"
+                                style="font-weight: 600; color: #3c4043; margin-bottom: 4px;"/>
+                            <Input
+                                value="{customer>/phone}"
+                                width="100%"
+                                maxLength="10"
+                                type="Number"
+                                placeholder="Enter 10-digit mobile number"/>
+                        </VBox>
 
+                   
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label
+                                text="Mobile Country Code"
+                                style="font-weight: 600; color: #3c4043; margin-bottom: 4px;"/>
+                            <Select
+                                width="100%"
+                                items="{/CountryCodes}"
+                                selectedKey="{customer>/phoneCode_code}">
+                                <core:Item key="{code}" text="{code}"/>
+                            </Select>
+                        </VBox>
 
-              
+                  
+                        <HBox alignItems="Start" class="sapUiSmallMarginBottom">
 
-                    <Label text="Mobile Country Code"/>
+                            <VBox width="160px" class="sapUiSmallMarginEnd">
+                                <Label
+                                    text="Title"
+                                    required="true"
+                                    style="font-weight: 600; color: #3c4043; margin-bottom: 4px;"/>
+                                <Select
+                                    width="100%"
+                                    items="{/Salutations}"
+                                    selectedKey="{customer>/salutation_code}">
+                                    <core:Item key="{code}" text="{name}"/>
+                                </Select>
+                            </VBox>
 
-                    <Select
-                        width="50%"
-                        items="{/CountryCodes}"
-                        selectedKey="{customer>/phoneCode_code}">
+                            <VBox class="sapUiSmallMarginEnd" style="flex: 1;">
+                                <Label
+                                    text="Customer Name"
+                                    required="true"
+                                    style="font-weight: 600; color: #3c4043; margin-bottom: 4px;"/>
+                                <Input
+                                    value="{customer>/name}"
+                                    width="100%"
+                                    placeholder="Enter full name"/>
+                            </VBox>
 
-                        <core:Item
-                            key="{code}"
-                            text="{code}"/>
-
-                    </Select>
-
+                        </HBox>
 
                 
+                        <VBox class="sapUiSmallMarginBottom">
+                            <Label
+                                text="Email Address"
+                                style="font-weight: 600; color: #3c4043; margin-bottom: 4px;"/>
+                            <Input
+                                value="{customer>/email}"
+                                width="100%"
+                                type="Email"
+                                placeholder="customer@example.com"/>
+                        </VBox>
 
-                    <Label text="Customer Title" required="true"/>
-
-                    <Select
-                        width="50%"
-                        items="{/Salutations}"
-                        selectedKey="{customer>/salutation_code}">
-
-                        <core:Item
-                            key="{code}"
-                            text="{name}"/>
-
-                    </Select>
-
-
-              
-
-                    <Label text="Customer Name" required="true"/>
-
-                    <Input
-                        value="{customer>/name}"
-                        width="50%"/>
-
+                      
+                        <core:HTML content="&lt;div style='border-top: 1px solid #f1f3f4; margin: 16px 0 20px;'&gt;&lt;/div&gt;"/>
 
                
+                        <HBox justifyContent="End" alignItems="Center">
+                            <Button
+                                text="Cancel"
+                                type="Transparent"
+                                press="onCancel"
+                                class="gvt-btn gvt-btn--danger sapUiSmallMarginEnd"/>
+                            <Button
+                                text="Add Customer"
+                                type="Emphasized"
+                                icon="sap-icon://add"
+                                press="onAddCustomer"
+                                class="gvt-btn gvt-btn--primary"/>
+                        </HBox>
 
-                    <Label text="Customer Email"/>
-
-                    <Input
-                        value="{customer>/email}"
-                        width="50%"/>
-
-                </f:SimpleForm>
-
-
-             
-
-                <Toolbar
-                    width="50%"
-                    class="sapUiMediumMarginTop">
-
-                    <ToolbarSpacer/>
-
-                    <Button
-                        text="Cancel"
-                        width="150px"
-                        press="onCancel"/>
-
-                    <Button
-                        text="Add Customer"
-                        width="150px"
-                      
-                        press="onAddCustomer"/>
-
-                </Toolbar>
+                    </VBox>
+                </VBox>
 
             </VBox>
 

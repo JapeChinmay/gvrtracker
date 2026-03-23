@@ -4,59 +4,59 @@
     xmlns="sap.m"
     xmlns:f="sap.ui.layout.form"
     xmlns:core="sap.ui.core"
->
-    <Page title="Gift Voucher Tracker - Display Screen">
-        <headerContent>
-            <Button
-                text="Home"
-                icon="sap-icon://home"
-                press="onHome"
-            />
-        </headerContent>
+    displayBlock="true">
 
-        <subHeader>
-            <Toolbar>
-                <ToolbarSpacer />
-                <RadioButtonGroup
-                    id="displayModeSelect"
-                    selectedIndex="0"
-                    columns="3"
-                    select="onDisplayModeSelect"
-                >
-                    <buttons>
-                        <RadioButton text="Create" />
-                        <RadioButton text="Return" />
-                        <RadioButton text="Replacement" />
-                    </buttons>
-                </RadioButtonGroup>
-                <ToolbarSpacer />
-            </Toolbar>
-        </subHeader>
+    <SplitApp
+        id="displaySplitApp"
+        defaultTransitionNameDetail="show"
+        defaultTransitionNameMaster="show"
+        mode="ShowHideMode">
 
-        <content>
-            <HBox
-                height="100%"
-                width="100%"
-            >
-                <VBox
-                    width="25%"
-                    class="sapUiSmallMargin"
-                    fitContainer="true"
-                >
-                    <Title
-                        text="GVR Numbers"
-                        level="H4"
-                        class="sapUiSmallMarginBottom"
-                    />
+        <masterPages>
+            <Page
+                id="masterPage"
+                showNavButton="false"
+                backgroundDesign="Solid">
 
-                    <SearchField
-                        id="gvrListSearch"
-                        placeholder="Search GVR Number"
-                        search="onGVRListSearch"
-                        liveChange="onGVRListSearch"
-                        width="100%"
-                        class="sapUiSmallMarginBottom"
-                    />
+                <customHeader >
+                    <Bar>
+                        <contentLeft>
+                            <Button icon="sap-icon://home" type="Transparent" press="onHome" tooltip="Home"/>
+                        </contentLeft>
+                        <contentMiddle>
+                            <Title text="GVR Numbers" level="H5"/>
+                        </contentMiddle>
+                    </Bar>
+                </customHeader>
+
+                <subHeader>
+                    <Toolbar style="padding: 4px 8px;">
+                        <ToolbarSpacer/>
+                        <RadioButtonGroup
+                            id="displayModeSelect"
+                            selectedIndex="0"
+                            columns="3"
+                            select="onDisplayModeSelect">
+                            <buttons>
+                                <RadioButton text="Create"/>
+                                <RadioButton text="Return"/>
+                                <RadioButton text="Replacement"/>
+                            </buttons>
+                        </RadioButtonGroup>
+                        <ToolbarSpacer/>
+                    </Toolbar>
+                </subHeader>
+
+                <content>
+                    <VBox class="sapUiTinyMarginBeginEnd sapUiTinyMarginTop">
+                        <SearchField
+                            id="gvrListSearch"
+                            placeholder="Search GVR / Mobile..."
+                            search="onGVRListSearch"
+                            liveChange="onGVRListSearch"
+                            width="100%"
+                            class="sapUiSmallMarginBottom"/>
+                    </VBox>
 
                     <List
                         id="gvrList"
@@ -65,289 +65,242 @@
                         noDataText="No GVRs found"
                         growing="true"
                         growingThreshold="20"
+                        showSeparators="Inner"
                         items="{
                             path: '/GVHeaderSet',
-                            parameters: {
-                                expand: 'customer'
-                            },
-                            sorter: {
-                                path: 'createdAt',
-                                descending: true
-                            }
-                        }"
-                    >
+                            parameters: { expand: 'customer' },
+                            sorter: { path: 'createdAt', descending: true }
+                        }">
                         <StandardListItem
                             title="{gv_no}"
                             description="{customer/phone}"
                             info="{
-  path: 'createdAt',
-  type: 'sap.ui.model.type.Date',
-  formatOptions: {
-    pattern: 'dd/MM/yyyy'
-  }
-}"
+                                path: 'createdAt',
+                                type: 'sap.ui.model.type.Date',
+                                formatOptions: { pattern: 'dd/MM/yyyy' }
+                            }"
                             type="Active"
-                        />
+                        
+                            iconDensityAware="false"/>
                     </List>
-                </VBox>
+                </content>
 
-                <VBox
-                    width="75%"
-                    class="sapUiSmallMargin"
-                    fitContainer="true"
-                >
-                    <Title
-                        text="GVR Details"
-                        level="H4"
-                        class="sapUiSmallMarginBottom"
-                    />
+            </Page>
+        </masterPages>
 
-                    <f:SimpleForm
-                        layout="ResponsiveGridLayout"
-                        columnsXL="4"
-                        columnsL="4"
-                        columnsM="2"
-                        editable="false"
-                    >
-                        <f:content>
-                            <Label text="GVR Number :" />
-                            <Text
-                                id="detailGVRNo"
-                                text="{gv_no}"
-                            />
+      
+        <detailPages>
+            <Page
+                id="detailPage"
+                showNavButton="false"
+                backgroundDesign="Solid">
 
-                            <Label text="GVR Type :" />
-                            <Text
-                                id="detailGVRType"
-                                text="{gvr_type_code}"
-                            />
+                <customHeader>
+                    <Bar>
+                        <contentLeft>
+                            <Button
+                                id="masterBtn"
+                                icon="sap-icon://menu2"
+                                type="Transparent"
+                                press="onShowMaster"
+                                tooltip="GVR List"/>
+                        </contentLeft>
+                        <contentMiddle>
+                            <Title text="GVR Details" level="H5"/>
+                        </contentMiddle>
+                        <contentRight>
+                            <Button text="Home" icon="sap-icon://home" type="Transparent" press="onHome"/>
+                        </contentRight>
+                    </Bar>
+                </customHeader>
 
-                            <Label
-                                id="lblTotalAssign"
-                                text="Total Assign Value :"
-                            />
-                            <Text
-                                id="detailTotalAssignValue"
-                                text="{assignGiftsTotal_amt}"
-                            />
+                <content>
 
-                            <Label
-                                id="lblTotalReturn"
-                                text="Total Return Value :"
-                            />
-                            <Text
-                                id="detailTotalReturnValue"
-                                text="{returnGiftsTotal_amt}"
-                            />
-
-                            <Label text="Customer Type :" />
-                            <Text
-                                id="detailCustType"
-                                text="{cust_type_code}"
-                            />
-
-                            <Label text="Customer Mobile :" />
-                            <Text
-                                id="detailCustMobile"
-                                text="{customer/phone}"
-                            />
-
-                            <Label
-                                id="lblCampaign"
-                                text="Campaign :"
-                            />
-                            <Text
-                                id="detailCampaign"
-                                text="{campaign/name}"
-                            />
-
-                            <Label text="GVR Date :" />
-                            <Text
-                                id="detailGVRDate"
-                             text="{
-  path: 'createdAt',
-  type: 'sap.ui.model.type.Date',
-  formatOptions: {
-    pattern: 'dd/MM/yyyy'
-  }
-}"
-                            />
-
-                            <Label text="Employee ID / Name :" />
-                            <Text
-                                id="detailEmployee"
-                                text="{employee_code}"
-                            />
-
-                            <Label text="Shopping Mall :" />
-                            <Text
-                                id="detailMall"
-                                text="{shoppingMall_plant_code}"
-                            />
-                        </f:content>
-                    </f:SimpleForm>
-
-                    <!-- Comments -->
-                    <HBox
-                        class="sapUiSmallMarginTop sapUiSmallMarginBottom"
+                    <VBox
+                        id="emptyState"
                         alignItems="Center"
-                    >
-                        <Label text="Comments :" />
+                        visible="true"
+                        style="padding-top: 100px;">
+                        <core:Icon
+                            src="sap-icon://document"
+                            size="4rem"
+                            color="#c8d3dc"
+                            class="sapUiMediumMarginBottom"/>
+                        <Title text="No GVR Selected" level="H4" style="color: #8a9bb0;"/>
                         <Text
-                            id="detailComments"
-                            text="{comment}"
-                            class="sapUiSmallMarginBegin"
-                        />
-                    </HBox>
+                            text="Select a GVR from the list to view details."
+                            style="color: #b0bcc8; margin-top: 8px;"/>
+                    </VBox>
 
-                    <Button
-                        id="viewBillInfoBtn"
-                        text="View Customer Bill Info"
-                        icon="sap-icon://documents"
-                        type="Transparent"
-                        class="sapUiSmallMarginBottom"
-                        press="onViewBillInfo"
-                        visible="true"
-                    />
-
-                    <Title
-                        id="assignTableTitle"
-                        text="Gift Items Issued to Customer"
-                        level="H4"
-                        class="sapUiMediumMarginTop sapUiSmallMarginBottom"
-                        visible="true"
-                    />
-
-                    <Table
-                        id="assignGiftItemsTable"
-                        inset="false"
-                        visible="true"
-                        noDataText="No assigned gift items"
-                        items="{path: 'assignGiftVouchers'}"
-                    >
-                        <columns>
-                            <Column width="150px">
-                                <Text text="Material Name" />
-                            </Column>
-                            <Column width="180px">
-                                <Text text="Description" />
-                            </Column>
-                            <Column width="100px">
-                                <Text text="Price" />
-                            </Column>
-                            <Column width="90px">
-                                <Text text="Issue Qty" />
-                            </Column>
-                            <Column width="160px">
-                                <Text text="Coupon" />
-                            </Column>
-                            <Column width="120px">
-                                <Text text="Brand" />
-                            </Column>
-                            <Column width="130px">
-                                <Text text="Expiry Date" />
-                            </Column>
-                            <Column width="120px">
-                                <Text text="Total Amount" />
-                            </Column>
-                        </columns>
-
-                        <items>
-                            <ColumnListItem type="Inactive">
-                                <cells>
-                                    <Text text="{giftVoucher/material}" />
-                                    <Text text="{giftVoucher/descr}" />
-                                    <Text text="{giftVoucher/price}" />
-                                    <Text text="{issue_quantity}" />
-                                    <Text text="{giftVoucher/coupon}" />
-                                    <Text text="{giftVoucher/brand}" />
-                                    <Text text="{giftVoucher/expDate}" />
-                                    <Text text="{total_amount}" />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-
-                    <Title
-                        id="returnTableTitle"
-                        text="Gift Items Returned by Customer"
-                        level="H4"
-                        class="sapUiMediumMarginTop sapUiSmallMarginBottom"
+                    <VBox
+                        id="detailContent"
                         visible="false"
-                    />
+                        class="sapUiMediumMarginBeginEnd sapUiSmallMarginTop">
 
-                    <Table
-                        id="returnGiftItemsTable"
-                        inset="false"
-                        visible="false"
-                        noDataText="No returned gift items"
-                        items="{path: 'returnGiftVouchers'}"
-                    >
-                        <columns>
-                            <Column width="150px">
-                                <Text text="Material Name" />
-                            </Column>
-                            <Column width="180px">
-                                <Text text="Description" />
-                            </Column>
-                            <Column width="100px">
-                                <Text text="Price" />
-                            </Column>
-                            <Column width="100px">
-                                <Text text="Return Qty" />
-                            </Column>
-                            <Column width="160px">
-                                <Text text="Coupon" />
-                            </Column>
-                            <Column width="120px">
-                                <Text text="Brand" />
-                            </Column>
-                            <Column width="130px">
-                                <Text text="Expiry Date" />
-                            </Column>
-                            <Column width="150px">
-                                <Text text="Original GVR" />
-                            </Column>
-                            <Column width="120px">
-                                <Text text="Total Amount" />
-                            </Column>
-                        </columns>
+                        <f:SimpleForm
+                            layout="ResponsiveGridLayout"
+                            columnsXL="4"
+                            columnsL="4"
+                            columnsM="2"
+                            editable="false"
+                            class="sapUiSmallMarginBottom">
+                            <f:content>
 
-                        <items>
-                            <ColumnListItem type="Inactive">
-                                <cells>
-                                    <Text text="{giftVoucher/material}" />
-                                    <Text text="{giftVoucher/descr}" />
-                                    <Text text="{giftVoucher/price}" />
-                                    <Text text="{issue_quantity}" />
-                                    <Text text="{giftVoucher/coupon}" />
-                                    <Text text="{giftVoucher/brand}" />
-                              <Text text="{
-  path: 'giftVoucher/expDate',
-  type: 'sap.ui.model.type.Date',
-  formatOptions: {
-    pattern: 'dd/MM/yyyy'
-  }
-}" />
-                                    <Text text="{returnedGVHeader/gv_no}" />
-                                    <Text text="{total_amount}" />
-                                </cells>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                </VBox>
-            </HBox>
-        </content>
+                                <Label text="GVR Number :"/>
+                                <Text id="detailGVRNo" text="{gv_no}"/>
 
-        <footer>
-            <Toolbar>
-                <ToolbarSpacer />
-                <Button
-                    text="Back"
-                    icon="sap-icon://nav-back"
-                    press="onHome"
-                />
-            </Toolbar>
-        </footer>
-    </Page>
+                                <Label text="GVR Type :"/>
+                                <Text id="detailGVRType" text="{gvr_type_code}"/>
+
+                                <Label id="lblTotalAssign" text="Total Assign Value :"/>
+                                <Text id="detailTotalAssignValue" text="{assignGiftsTotal_amt}"/>
+
+                                <Label id="lblTotalReturn" text="Total Return Value :"/>
+                                <Text id="detailTotalReturnValue" text="{returnGiftsTotal_amt}"/>
+
+                                <Label text="Customer Type :"/>
+                                <Text id="detailCustType" text="{cust_type_code}"/>
+
+                                <Label text="Customer Mobile :"/>
+                                <Text id="detailCustMobile" text="{customer/phone}"/>
+
+                                <Label id="lblCampaign" text="Campaign :"/>
+                                <Text id="detailCampaign" text="{campaign/name}"/>
+
+                                <Label text="GVR Date :"/>
+                                <Text id="detailGVRDate" text="{
+                                    path: 'createdAt',
+                                    type: 'sap.ui.model.type.Date',
+                                    formatOptions: { pattern: 'dd/MM/yyyy' }
+                                }"/>
+
+                                <Label text="Employee ID / Name :"/>
+                                <Text id="detailEmployee" text="{employee_code}"/>
+
+                                <Label text="Shopping Mall :"/>
+                                <Text id="detailMall" text="{shoppingMall_plant_code}"/>
+
+                            </f:content>
+                        </f:SimpleForm>
+
+               
+                        <HBox alignItems="Center" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
+                            <Label text="Comments :"/>
+                            <Text id="detailComments" text="{comment}" class="sapUiSmallMarginBegin"/>
+                        </HBox>
+
+                        <Button
+                            id="viewBillInfoBtn"
+                            text="View Customer Bill Info"
+                            icon="sap-icon://documents"
+                            type="Transparent"
+                            class="sapUiSmallMarginBottom"
+                            press="onViewBillInfo"
+                            visible="true"/>
+
+                        <core:HTML content="&lt;div style='border-top:1px solid #e8eaed; margin: 8px 0 16px;'&gt;&lt;/div&gt;"/>
+
+                     
+                        <Title
+                            id="assignTableTitle"
+                            text="Gift Items Issued to Customer"
+                            level="H4"
+                            class="sapUiSmallMarginBottom"
+                            visible="true"/>
+
+                        <Table
+                            id="assignGiftItemsTable"
+                            inset="false"
+                            visible="true"
+                            noDataText="No assigned gift items"
+                            class="sapUiSmallMarginBottom"
+                            items="{path: 'assignGiftVouchers'}">
+                            <columns>
+                                <Column width="150px"><Text text="Material Name"/></Column>
+                                <Column width="180px"><Text text="Description"/></Column>
+                                <Column width="100px"><Text text="Price"/></Column>
+                                <Column width="90px"> <Text text="Issue Qty"/></Column>
+                                <Column width="160px"><Text text="Coupon"/></Column>
+                                <Column width="120px"><Text text="Brand"/></Column>
+                                <Column width="130px"><Text text="Expiry Date"/></Column>
+                                <Column width="120px"><Text text="Total Amount"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem type="Inactive">
+                                    <cells>
+                                        <Text text="{giftVoucher/material}"/>
+                                        <Text text="{giftVoucher/descr}"/>
+                                        <Text text="{giftVoucher/price}"/>
+                                        <Text text="{issue_quantity}"/>
+                                        <Text text="{giftVoucher/coupon}"/>
+                                        <Text text="{giftVoucher/brand}"/>
+                                        <Text text="{giftVoucher/expDate}"/>
+                                        <Text text="{total_amount}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+
+                        <Title
+                            id="returnTableTitle"
+                            text="Gift Items Returned by Customer"
+                            level="H4"
+                            class="sapUiMediumMarginTop sapUiSmallMarginBottom"
+                            visible="false"/>
+
+                        <Table
+                            id="returnGiftItemsTable"
+                            inset="false"
+                            visible="false"
+                            noDataText="No returned gift items"
+                            class="sapUiSmallMarginBottom"
+                            items="{path: 'returnGiftVouchers'}">
+                            <columns>
+                                <Column width="150px"><Text text="Material Name"/></Column>
+                                <Column width="180px"><Text text="Description"/></Column>
+                                <Column width="100px"><Text text="Price"/></Column>
+                                <Column width="100px"><Text text="Return Qty"/></Column>
+                                <Column width="160px"><Text text="Coupon"/></Column>
+                                <Column width="120px"><Text text="Brand"/></Column>
+                                <Column width="130px"><Text text="Expiry Date"/></Column>
+                                <Column width="150px"><Text text="Original GVR"/></Column>
+                                <Column width="120px"><Text text="Total Amount"/></Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem type="Inactive">
+                                    <cells>
+                                        <Text text="{giftVoucher/material}"/>
+                                        <Text text="{giftVoucher/descr}"/>
+                                        <Text text="{giftVoucher/price}"/>
+                                        <Text text="{issue_quantity}"/>
+                                        <Text text="{giftVoucher/coupon}"/>
+                                        <Text text="{giftVoucher/brand}"/>
+                                        <Text text="{
+                                            path: 'giftVoucher/expDate',
+                                            type: 'sap.ui.model.type.Date',
+                                            formatOptions: { pattern: 'dd/MM/yyyy' }
+                                        }"/>
+                                        <Text text="{returnedGVHeader/gv_no}"/>
+                                        <Text text="{total_amount}"/>
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+
+                        <core:HTML content="&lt;div style='height:40px;'&gt;&lt;/div&gt;"/>
+
+                    </VBox>
+                </content>
+
+                <footer>
+                    <Toolbar>
+                        <ToolbarSpacer/>
+                        <Button text="Back" icon="sap-icon://nav-back" press="onHome"/>
+                    </Toolbar>
+                </footer>
+
+            </Page>
+        </detailPages>
+
+    </SplitApp>
 </mvc:View>

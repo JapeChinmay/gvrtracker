@@ -7,7 +7,6 @@ sap.ui.define([
 ], function (Controller, Filter, FilterOperator, MessageToast, MessageBox) {
     "use strict";
 
-    // GVR type codes
     var GVR_TYPE = {
         CREATE:      "CI",
         RETURN:      "RT",
@@ -22,11 +21,9 @@ sap.ui.define([
 
     return Controller.extend("gvtracker.controller.DisplayScreen", {
 
-    
-
         onInit: function () {
-    
             this._sCurrentMode = "CREATE";
+        
 
             var oRouter = this.getOwnerComponent().getRouter();
             oRouter.getRoute("RouteDisplayScreen")
@@ -36,86 +33,72 @@ sap.ui.define([
         _onRouteMatched: function (oEvent) {
             var sGVR = oEvent.getParameter("arguments").gvr;
 
-         
             this._clearDetailPanel();
-
-       
             this.byId("displayModeSelect").setSelectedIndex(0);
             this._sCurrentMode = "CREATE";
-
-          
             this._reloadGVRList();
 
-      
             if (sGVR) {
                 this._loadGVRByNumber(sGVR);
             }
         },
 
+        onShowMaster: function () {
+            this.byId("displaySplitApp").showMaster();
+        },
 
-
+      
         onDisplayModeSelect: function (oEvent) {
             var iIndex = oEvent.getSource().getSelectedIndex();
-
             if (iIndex === 0)      { this._sCurrentMode = "CREATE"; }
             else if (iIndex === 1) { this._sCurrentMode = "RETURN"; }
             else if (iIndex === 2) { this._sCurrentMode = "REPLACEMENT"; }
 
-            // Clear detail and reload filtered list
             this._clearDetailPanel();
             this._reloadGVRList();
         },
 
-
         _reloadGVRList: function () {
             var oList    = this.byId("gvrList");
             var oBinding = oList.getBinding("items");
-
             if (!oBinding) { return; }
 
-            var sTypeCode = GVR_TYPE[this._sCurrentMode];
             oBinding.filter([
-                new Filter("gvr_type_code", FilterOperator.EQ, sTypeCode)
+                new Filter("gvr_type_code", FilterOperator.EQ, GVR_TYPE[this._sCurrentMode])
             ]);
         },
 
-   
-
         onGVRListSearch: function (oEvent) {
-            var sQuery   = oEvent.getParameter("query") ||
-                           oEvent.getParameter("newValue") || "";
-            var oList    = this.byId("gvrList");
-            var oBinding = oList.getBinding("items");
+            var sQuery    = oEvent.getParameter("query") ||
+                            oEvent.getParameter("newValue") || "";
+            var oList     = this.byId("gvrList");
+            var oBinding  = oList.getBinding("items");
             var sTypeCode = GVR_TYPE[this._sCurrentMode];
 
             var aFilters = [
                 new Filter("gvr_type_code", FilterOperator.EQ, sTypeCode)
             ];
-
             if (sQuery) {
                 aFilters.push(new Filter("gv_no", FilterOperator.Contains, sQuery));
             }
-
             oBinding.filter(aFilters);
         },
 
-
+    
         onGVRItemSelect: function (oEvent) {
             var oItem    = oEvent.getParameter("listItem");
             var oContext = oItem.getBindingContext();
             var sPath    = oContext.getPath();
             var oModel   = this.getView().getModel();
-            var oView    = this.getView();
+
+            this.byId("emptyState").setVisible(false);
+            this.byId("detailContent").setVisible(true);
 
             this._setDetailContext(oContext);
 
-         
             oModel.read(sPath, {
-                urlParameters: {
-                    "$expand": EXPAND[this._sCurrentMode]
-                },
+                urlParameters: { "$expand": EXPAND[this._sCurrentMode] },
                 success: function () {
-               
                     this._setDetailContext(oContext);
                     this._applyTableVisibility();
                 }.bind(this),
@@ -124,24 +107,28 @@ sap.ui.define([
                     MessageBox.error("Error loading GVR details.");
                 }
             });
+
+       
+            this.byId("displaySplitApp").toDetail(
+                this.byId("detailPage").getId()
+            );
         },
 
-
-
+ 
         _loadGVRByNumber: function (sGVR) {
             var oModel = this.getView().getModel();
             oModel.read("/GVHeaderSet", {
-                filters: [
-                    new Filter("gv_no", FilterOperator.EQ, sGVR)
-                ],
-                urlParameters: {
-                    "$expand": EXPAND[this._sCurrentMode]
-                },
+                filters: [ new Filter("gv_no", FilterOperator.EQ, sGVR) ],
+                urlParameters: { "$expand": EXPAND[this._sCurrentMode] },
                 success: function (oData) {
                     if (oData.results.length > 0) {
-                        var oResult = oData.results[0];
-                        var sPath   = "/GVHeaderSet(guid'" + oResult.ID + "')";
+                        var oResult  = oData.results[0];
+                        var sPath    = "/GVHeaderSet(guid'" + oResult.ID + "')";
                         var oContext = oModel.getContext(sPath);
+
+                        this.byId("emptyState").setVisible(false);
+                        this.byId("detailContent").setVisible(true);
+
                         this._setDetailContext(oContext);
                         this._applyTableVisibility();
                     } else {
@@ -155,8 +142,7 @@ sap.ui.define([
             });
         },
 
-     
-
+    
         _setDetailContext: function (oContext) {
             var oView = this.getView();
             var aIds  = [
@@ -165,68 +151,42 @@ sap.ui.define([
                 "detailCampaign", "detailGVRDate", "detailEmployee",
                 "detailMall", "detailComments"
             ];
-
             aIds.forEach(function (sId) {
                 var oCtrl = oView.byId(sId);
                 if (oCtrl) { oCtrl.setBindingContext(oContext); }
             });
 
-            // Bind tables
             oView.byId("assignGiftItemsTable").setBindingContext(oContext);
             oView.byId("returnGiftItemsTable").setBindingContext(oContext);
 
             this._applyTableVisibility();
         },
 
- 
-
+     
         _applyTableVisibility: function () {
             var oView = this.getView();
             var sMode = this._sCurrentMode;
 
-            // Titles
-            oView.byId("assignTableTitle").setVisible(
-                sMode === "CREATE" || sMode === "REPLACEMENT"
-            );
-            oView.byId("returnTableTitle").setVisible(
-                sMode === "RETURN" || sMode === "REPLACEMENT"
-            );
+            var bAssign = (sMode === "CREATE" || sMode === "REPLACEMENT");
+            var bReturn = (sMode === "RETURN" || sMode === "REPLACEMENT");
 
-            // Tables
-            oView.byId("assignGiftItemsTable").setVisible(
-                sMode === "CREATE" || sMode === "REPLACEMENT"
-            );
-            oView.byId("returnGiftItemsTable").setVisible(
-                sMode === "RETURN" || sMode === "REPLACEMENT"
-            );
+            oView.byId("assignTableTitle").setVisible(bAssign);
+            oView.byId("assignGiftItemsTable").setVisible(bAssign);
 
-            // Total fields — show relevant one
-            oView.byId("lblTotalAssign").setVisible(
-                sMode === "CREATE" || sMode === "REPLACEMENT"
-            );
-            oView.byId("detailTotalAssignValue").setVisible(
-                sMode === "CREATE" || sMode === "REPLACEMENT"
-            );
-            oView.byId("lblTotalReturn").setVisible(
-                sMode === "RETURN" || sMode === "REPLACEMENT"
-            );
-            oView.byId("detailTotalReturnValue").setVisible(
-                sMode === "RETURN" || sMode === "REPLACEMENT"
-            );
+            oView.byId("returnTableTitle").setVisible(bReturn);
+            oView.byId("returnGiftItemsTable").setVisible(bReturn);
 
-            // Campaign only shown for CREATE and REPLACEMENT
-            oView.byId("lblCampaign").setVisible(
-                sMode === "CREATE" || sMode === "REPLACEMENT"
-            );
-            oView.byId("detailCampaign").setVisible(
-                sMode === "CREATE" || sMode === "REPLACEMENT"
-            );
+            oView.byId("lblTotalAssign").setVisible(bAssign);
+            oView.byId("detailTotalAssignValue").setVisible(bAssign);
 
-            // View Bill Info button only for CREATE
+            oView.byId("lblTotalReturn").setVisible(bReturn);
+            oView.byId("detailTotalReturnValue").setVisible(bReturn);
+
+            oView.byId("lblCampaign").setVisible(bAssign);
+            oView.byId("detailCampaign").setVisible(bAssign);
+
             oView.byId("viewBillInfoBtn").setVisible(sMode === "CREATE");
         },
-
-    
 
         _clearDetailPanel: function () {
             var oView = this.getView();
@@ -242,8 +202,10 @@ sap.ui.define([
             });
             oView.byId("assignGiftItemsTable").setBindingContext(null);
             oView.byId("returnGiftItemsTable").setBindingContext(null);
-        },
 
+            oView.byId("emptyState").setVisible(true);
+            oView.byId("detailContent").setVisible(false);
+        },
 
         onViewBillInfo: function () {
             var oContext = this.byId("detailGVRNo").getBindingContext();
